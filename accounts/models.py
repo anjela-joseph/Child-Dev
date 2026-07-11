@@ -41,3 +41,8 @@ class ChildProfile(models.Model):
         return today.year - self.date_of_birth.year - (
             (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
         )
+    @property
+    def age_in_months(self):
+        from datetime import date
+        today = date.today()
+        return (today.year - self.date_of_birth.year) * 12 + today.month - self.date_of_birth.month
