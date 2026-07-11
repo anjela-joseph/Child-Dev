@@ -1,0 +1,122 @@
+[
+  {"model": "milestones.milestonecategory", "pk": 1, "fields": {"name": "Social & Emotional", "domain": "social_emotional", "description": ""}},
+  {"model": "milestones.milestonecategory", "pk": 2, "fields": {"name": "Language & Communication", "domain": "language_communication", "description": ""}},
+  {"model": "milestones.milestonecategory", "pk": 3, "fields": {"name": "Cognitive / Early Learning", "domain": "cognitive", "description": ""}},
+  {"model": "milestones.milestonecategory", "pk": 4, "fields": {"name": "Gross Motor", "domain": "gross_motor", "description": ""}},
+  {"model": "milestones.milestonecategory", "pk": 5, "fields": {"name": "Fine Motor & Self-Help", "domain": "fine_motor", "description": ""}},
+  {"model": "milestones.milestonecategory", "pk": 6, "fields": {"name": "Behavior & Attention", "domain": "behavior_attention", "description": ""}},
+
+  {"model": "milestones.milestoneitem", "pk": 1,  "fields": {"category": 1, "age_group": 3, "description": "Calms down within 10 minutes after separation from a caregiver.", "severity_if_missed": "medium", "concern_tags": ["social_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 2,  "fields": {"category": 1, "age_group": 3, "description": "Notices other children and joins them in play.", "severity_if_missed": "medium", "concern_tags": ["asd", "social_delay"], "is_red_flag": false, "order": 2}},
+
+  {"model": "milestones.milestoneitem", "pk": 3,  "fields": {"category": 2, "age_group": 3, "description": "Uses conversation with at least two back-and-forth exchanges.", "severity_if_missed": "medium", "concern_tags": ["asd", "language_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 4,  "fields": {"category": 2, "age_group": 3, "description": "Asks 'who', 'what', 'where', or 'why' questions.", "severity_if_missed": "low", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 5,  "fields": {"category": 2, "age_group": 3, "description": "Says what action is happening in a picture or book.", "severity_if_missed": "low", "concern_tags": ["language_delay", "cognitive"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 6,  "fields": {"category": 2, "age_group": 3, "description": "Says first name when asked.", "severity_if_missed": "low", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 4}},
+  {"model": "milestones.milestoneitem", "pk": 7,  "fields": {"category": 2, "age_group": 3, "description": "Speaks well enough for others to understand most of the time.", "severity_if_missed": "high", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 5}},
+
+  {"model": "milestones.milestoneitem", "pk": 8,  "fields": {"category": 3, "age_group": 3, "description": "Draws a circle when shown how.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 9,  "fields": {"category": 3, "age_group": 3, "description": "Avoids touching hot objects when warned.", "severity_if_missed": "medium", "concern_tags": ["general"], "is_red_flag": false, "order": 2}},
+
+  {"model": "milestones.milestoneitem", "pk": 10, "fields": {"category": 5, "age_group": 3, "description": "Strings large beads or similar items together.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 11, "fields": {"category": 5, "age_group": 3, "description": "Puts on some clothes, such as loose pants or a jacket.", "severity_if_missed": "low", "concern_tags": ["general"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 12, "fields": {"category": 5, "age_group": 3, "description": "Uses a fork.", "severity_if_missed": "low", "concern_tags": ["general"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 13, "fields": {"category": 1, "age_group": 4, "description": "Plays cooperatively with other children.", "severity_if_missed": "medium", "concern_tags": ["asd", "social_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 14, "fields": {"category": 1, "age_group": 4, "description": "Adapts to simple rules and routines.", "severity_if_missed": "medium", "concern_tags": ["asd", "adhd"], "is_red_flag": false, "order": 2}},
+
+  {"model": "milestones.milestoneitem", "pk": 15, "fields": {"category": 2, "age_group": 4, "description": "Speaks in longer, clearer sentences.", "severity_if_missed": "medium", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 16, "fields": {"category": 2, "age_group": 4, "description": "Tells simple stories and answers questions about events.", "severity_if_missed": "medium", "concern_tags": ["language_delay", "asd"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 17, "fields": {"category": 2, "age_group": 4, "description": "Understands and follows 2-step directions.", "severity_if_missed": "medium", "concern_tags": ["language_delay", "adhd"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 18, "fields": {"category": 3, "age_group": 4, "description": "Copies a square.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 19, "fields": {"category": 3, "age_group": 4, "description": "Identifies basic concepts such as same/different and simple opposites.", "severity_if_missed": "low", "concern_tags": ["general"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 20, "fields": {"category": 3, "age_group": 4, "description": "Begins counting and matching activities.", "severity_if_missed": "low", "concern_tags": ["general"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 21, "fields": {"category": 4, "age_group": 4, "description": "Stands on one foot for up to 5 seconds.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 22, "fields": {"category": 4, "age_group": 4, "description": "Kicks a ball forward.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 23, "fields": {"category": 4, "age_group": 4, "description": "Throws a ball overhand.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 24, "fields": {"category": 4, "age_group": 4, "description": "Catches a bounced ball.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 4}},
+  {"model": "milestones.milestoneitem", "pk": 25, "fields": {"category": 4, "age_group": 4, "description": "Runs around obstacles.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 5}},
+  {"model": "milestones.milestoneitem", "pk": 26, "fields": {"category": 4, "age_group": 4, "description": "Walks on a line.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 6}},
+  {"model": "milestones.milestoneitem", "pk": 27, "fields": {"category": 4, "age_group": 4, "description": "Hops on one foot.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 7}},
+  {"model": "milestones.milestoneitem", "pk": 28, "fields": {"category": 4, "age_group": 4, "description": "Jumps over an object and lands with both feet together.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 8}},
+
+  {"model": "milestones.milestoneitem", "pk": 29, "fields": {"category": 1, "age_group": 5, "description": "Plays in groups and takes turns more reliably.", "severity_if_missed": "medium", "concern_tags": ["asd", "adhd", "social_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 30, "fields": {"category": 1, "age_group": 5, "description": "Separates from caregivers with less distress.", "severity_if_missed": "medium", "concern_tags": ["social_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 31, "fields": {"category": 1, "age_group": 5, "description": "Follows classroom routines with support.", "severity_if_missed": "medium", "concern_tags": ["adhd", "asd"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 32, "fields": {"category": 2, "age_group": 5, "description": "Uses full sentences.", "severity_if_missed": "medium", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 33, "fields": {"category": 2, "age_group": 5, "description": "Tells a simple story with a beginning and end.", "severity_if_missed": "medium", "concern_tags": ["language_delay", "asd"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 34, "fields": {"category": 2, "age_group": 5, "description": "Answers 'why' questions.", "severity_if_missed": "low", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 35, "fields": {"category": 2, "age_group": 5, "description": "Speaks clearly enough for most adults to understand.", "severity_if_missed": "high", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 4}},
+
+  {"model": "milestones.milestoneitem", "pk": 36, "fields": {"category": 3, "age_group": 5, "description": "Counts and begins basic number concepts.", "severity_if_missed": "low", "concern_tags": ["general"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 37, "fields": {"category": 3, "age_group": 5, "description": "Recognizes some letters, shapes, and colors.", "severity_if_missed": "medium", "concern_tags": ["dyslexia"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 38, "fields": {"category": 3, "age_group": 5, "description": "Copies simple shapes and may begin writing letters or name.", "severity_if_missed": "low", "concern_tags": ["motor_delay", "dyslexia"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 39, "fields": {"category": 4, "age_group": 5, "description": "Walks upstairs while holding an object.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 40, "fields": {"category": 4, "age_group": 5, "description": "Walks backward heel-to-toe.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 41, "fields": {"category": 4, "age_group": 5, "description": "Jumps forward repeatedly without falling.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 42, "fields": {"category": 4, "age_group": 5, "description": "Skips after demonstration.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 4}},
+  {"model": "milestones.milestoneitem", "pk": 43, "fields": {"category": 4, "age_group": 5, "description": "Hangs from a bar for at least 5 seconds.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 5}},
+  {"model": "milestones.milestoneitem", "pk": 44, "fields": {"category": 4, "age_group": 5, "description": "Throws a ball with same-side stepping.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 6}},
+  {"model": "milestones.milestoneitem", "pk": 45, "fields": {"category": 4, "age_group": 5, "description": "Catches a small ball with hands only.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 7}},
+
+  {"model": "milestones.milestoneitem", "pk": 46, "fields": {"category": 1, "age_group": 6, "description": "Maintains friendships and plays cooperatively.", "severity_if_missed": "medium", "concern_tags": ["asd", "social_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 47, "fields": {"category": 1, "age_group": 6, "description": "Handles more structured group settings.", "severity_if_missed": "medium", "concern_tags": ["adhd", "asd"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 48, "fields": {"category": 1, "age_group": 6, "description": "Shows improving emotional control, though still needs adult help at times.", "severity_if_missed": "low", "concern_tags": ["adhd", "ocd"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 49, "fields": {"category": 2, "age_group": 6, "description": "Uses complete, understandable sentences.", "severity_if_missed": "medium", "concern_tags": ["language_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 50, "fields": {"category": 2, "age_group": 6, "description": "Can explain ideas and retell events in sequence.", "severity_if_missed": "medium", "concern_tags": ["language_delay", "asd"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 51, "fields": {"category": 2, "age_group": 6, "description": "Understands and follows multi-step directions.", "severity_if_missed": "medium", "concern_tags": ["adhd", "language_delay"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 52, "fields": {"category": 3, "age_group": 6, "description": "Recognizes letters and many sounds.", "severity_if_missed": "medium", "concern_tags": ["dyslexia"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 53, "fields": {"category": 3, "age_group": 6, "description": "Begins reading simple words.", "severity_if_missed": "medium", "concern_tags": ["dyslexia"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 54, "fields": {"category": 3, "age_group": 6, "description": "Can focus on a task for longer periods.", "severity_if_missed": "medium", "concern_tags": ["adhd"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 55, "fields": {"category": 3, "age_group": 6, "description": "Understands early school concepts such as patterns, left/right, and basic time ideas.", "severity_if_missed": "low", "concern_tags": ["general"], "is_red_flag": false, "order": 4}},
+
+  {"model": "milestones.milestoneitem", "pk": 56, "fields": {"category": 4, "age_group": 6, "description": "Runs lightly on toes.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 57, "fields": {"category": 4, "age_group": 6, "description": "Walks on a balance beam.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 58, "fields": {"category": 4, "age_group": 6, "description": "Skips using a skipping rope.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 59, "fields": {"category": 4, "age_group": 6, "description": "Hops for about 2 metres.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 4}},
+  {"model": "milestones.milestoneitem", "pk": 60, "fields": {"category": 4, "age_group": 6, "description": "Shows mature throwing and catching patterns.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 5}},
+  {"model": "milestones.milestoneitem", "pk": 61, "fields": {"category": 4, "age_group": 6, "description": "Has more refined jumping skills.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 6}},
+
+  {"model": "milestones.milestoneitem", "pk": 62, "fields": {"category": 1, "age_group": 7, "description": "Maintains friendships.", "severity_if_missed": "medium", "concern_tags": ["asd", "social_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 63, "fields": {"category": 1, "age_group": 7, "description": "Understands rules, teamwork, and fairness better.", "severity_if_missed": "medium", "concern_tags": ["asd", "social_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 64, "fields": {"category": 1, "age_group": 7, "description": "Manages frustration more independently.", "severity_if_missed": "medium", "concern_tags": ["adhd", "ocd"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 65, "fields": {"category": 1, "age_group": 7, "description": "Can usually separate feelings from behavior with adult support.", "severity_if_missed": "medium", "concern_tags": ["adhd", "ocd"], "is_red_flag": false, "order": 4}},
+
+  {"model": "milestones.milestoneitem", "pk": 66, "fields": {"category": 2, "age_group": 7, "description": "Tells organized stories and gives explanations.", "severity_if_missed": "medium", "concern_tags": ["language_delay", "asd"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 67, "fields": {"category": 2, "age_group": 7, "description": "Understands classroom instructions and group discussions.", "severity_if_missed": "medium", "concern_tags": ["language_delay", "adhd"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 68, "fields": {"category": 2, "age_group": 7, "description": "Uses language for problem-solving and social negotiation.", "severity_if_missed": "medium", "concern_tags": ["asd", "language_delay"], "is_red_flag": false, "order": 3}},
+
+  {"model": "milestones.milestoneitem", "pk": 69, "fields": {"category": 3, "age_group": 7, "description": "Reads simple text more fluently.", "severity_if_missed": "high", "concern_tags": ["dyslexia"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 70, "fields": {"category": 3, "age_group": 7, "description": "Writes short sentences.", "severity_if_missed": "medium", "concern_tags": ["dyslexia", "motor_delay"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 71, "fields": {"category": 3, "age_group": 7, "description": "Spells some common words.", "severity_if_missed": "medium", "concern_tags": ["dyslexia"], "is_red_flag": false, "order": 3}},
+  {"model": "milestones.milestoneitem", "pk": 72, "fields": {"category": 3, "age_group": 7, "description": "Solves age-appropriate math and reasoning tasks.", "severity_if_missed": "medium", "concern_tags": ["general"], "is_red_flag": false, "order": 4}},
+  {"model": "milestones.milestoneitem", "pk": 73, "fields": {"category": 3, "age_group": 7, "description": "Can complete multi-step school tasks with less prompting.", "severity_if_missed": "medium", "concern_tags": ["adhd"], "is_red_flag": false, "order": 5}},
+
+  {"model": "milestones.milestoneitem", "pk": 74, "fields": {"category": 4, "age_group": 7, "description": "Has steady coordination for sports, handwriting, and self-care.", "severity_if_missed": "medium", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+  {"model": "milestones.milestoneitem", "pk": 75, "fields": {"category": 4, "age_group": 7, "description": "Can copy more complex shapes and write more legibly.", "severity_if_missed": "low", "concern_tags": ["motor_delay", "dyslexia"], "is_red_flag": false, "order": 2}},
+  {"model": "milestones.milestoneitem", "pk": 76, "fields": {"category": 5, "age_group": 7, "description": "Handles buttons, zippers, utensils, and dressing more independently.", "severity_if_missed": "low", "concern_tags": ["motor_delay"], "is_red_flag": false, "order": 1}},
+
+  {"model": "milestones.redflag", "pk": 1,  "fields": {"description": "Loss of previously learned skills at any age.", "scope": "global", "concern_tags": ["asd", "general"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 2,  "fields": {"description": "Delay in more than one developmental domain (e.g. speech and motor).", "scope": "global", "concern_tags": ["general"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 3,  "fields": {"description": "No progress over time, or developmental arrest after earlier normal progress.", "scope": "global", "concern_tags": ["general"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 4,  "fields": {"description": "Strong parental concern that persists over time.", "scope": "global", "concern_tags": ["general"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 5,  "fields": {"description": "Poor eye contact, limited social response, or not responding to name.", "scope": "social_communication", "concern_tags": ["asd"], "applies_to_ages": [3,4,5]}},
+  {"model": "milestones.redflag", "pk": 6,  "fields": {"description": "Not pointing to show interest, not sharing attention, or little back-and-forth interaction.", "scope": "social_communication", "concern_tags": ["asd"], "applies_to_ages": [3,4,5]}},
+  {"model": "milestones.redflag", "pk": 7,  "fields": {"description": "Limited pretend play, very restricted interests, or repetitive behaviors.", "scope": "social_communication", "concern_tags": ["asd"], "applies_to_ages": [3,4,5]}},
+  {"model": "milestones.redflag", "pk": 8,  "fields": {"description": "Speech that is absent, very delayed, or hard to understand compared with age expectations.", "scope": "social_communication", "concern_tags": ["language_delay", "asd"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 9,  "fields": {"description": "Very poor balance, unusual clumsiness, or obvious asymmetry in movement.", "scope": "motor", "concern_tags": ["motor_delay"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 10, "fields": {"description": "Loss of coordination, persistent toe walking, or abnormal muscle tone.", "scope": "motor", "concern_tags": ["motor_delay"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 11, "fields": {"description": "Not using both hands well, or very early clear hand preference.", "scope": "motor", "concern_tags": ["motor_delay"], "applies_to_ages": [3,4]}},
+  {"model": "milestones.redflag", "pk": 12, "fields": {"description": "Trouble recognizing letters, sounds, rhyming, or learning new concepts.", "scope": "learning", "concern_tags": ["dyslexia"], "applies_to_ages": [5,6,7]}},
+  {"model": "milestones.redflag", "pk": 13, "fields": {"description": "Ongoing difficulty following instructions, remembering routines, or finishing simple tasks.", "scope": "learning", "concern_tags": ["adhd"], "applies_to_ages": [4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 14, "fields": {"description": "Attention, impulsivity, and high activity that clearly interfere with home or school.", "scope": "behavior", "concern_tags": ["adhd"], "applies_to_ages": [4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 15, "fields": {"description": "Severe tantrums that are frequent, prolonged, or very hard to calm.", "scope": "behavior", "concern_tags": ["general", "ocd"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 16, "fields": {"description": "Extreme rigidity, intense distress with routine changes, or repetitive checking/ordering behaviors.", "scope": "behavior", "concern_tags": ["asd", "ocd"], "applies_to_ages": [3,4,5,6,7]}},
+  {"model": "milestones.redflag", "pk": 17, "fields": {"description": "Persistent anxiety, withdrawal, or fear that affects daily life.", "scope": "behavior", "concern_tags": ["ocd", "general"], "applies_to_ages": [3,4,5,6,7]}}
+]

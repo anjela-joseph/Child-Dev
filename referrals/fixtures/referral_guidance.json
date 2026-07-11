@@ -1,0 +1,218 @@
+[
+  {
+    "model": "referrals.referralguidance",
+    "pk": 1,
+    "fields": {
+      "risk_level": "green",
+      "concern_tag": "",
+      "heading": "Your child is on track!",
+      "message": "Great news — your child is meeting most milestones expected for their age. This is a positive sign of healthy development. Keep doing what you are doing. Continue reading together, encouraging play with other children, keeping daily routines predictable, and limiting excessive screen time. Check back in at the next age milestone to keep tracking progress.",
+      "action_items": [
+        "Read and talk with your child daily.",
+        "Encourage play with other children.",
+        "Keep daily routines predictable.",
+        "Limit screen time to age-appropriate amounts.",
+        "Attend regular well-child visits with your pediatrician."
+      ],
+      "suggested_specialists": []
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 2,
+    "fields": {
+      "risk_level": "yellow",
+      "concern_tag": "",
+      "heading": "One area to keep an eye on",
+      "message": "Your child is doing well overall, but there is one area that may be worth monitoring a little more closely. This is not a cause for alarm — children develop at slightly different paces, and a single area of concern often resolves with time and the right support at home. We suggest revisiting this checklist in 4 to 6 weeks. If the concern remains, it is a good idea to mention it at your next pediatrician visit.",
+      "action_items": [
+        "Revisit this checklist in 4 to 6 weeks.",
+        "Mention the concern at your next pediatrician appointment.",
+        "Encourage activities that support the area of concern.",
+        "Read and talk with your child daily.",
+        "Keep routines consistent and predictable."
+      ],
+      "suggested_specialists": ["pediatrician"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 3,
+    "fields": {
+      "risk_level": "orange",
+      "concern_tag": "",
+      "heading": "Some areas need closer monitoring",
+      "message": "Your answers suggest your child may be showing delays or difficulties in more than one area of development. This does not mean something is definitely wrong, but it is worth discussing with a professional sooner rather than later. Early support can make a real difference. We recommend speaking with your child's pediatrician and asking about a developmental screening. You do not need to wait until the next scheduled visit — call and mention your concerns.",
+      "action_items": [
+        "Contact your pediatrician and request a developmental screening.",
+        "Do not wait for the next scheduled appointment — call now.",
+        "Note which specific milestones your child has not yet reached.",
+        "Check your child's hearing and vision if speech or attention is a concern.",
+        "Keep a simple diary of your child's behaviors to share with the doctor."
+      ],
+      "suggested_specialists": ["pediatrician", "dev_pediatrician", "speech_therapist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 4,
+    "fields": {
+      "risk_level": "red",
+      "concern_tag": "",
+      "heading": "We recommend seeking an evaluation soon",
+      "message": "Some of your answers suggest your child may benefit from a professional evaluation as soon as possible. This does not mean your child has a diagnosis — it means that a specialist can help you understand what is happening and put the right support in place early. The earlier concerns are identified, the more effective the support can be. Please contact your pediatrician or a developmental specialist this week.",
+      "action_items": [
+        "Contact your pediatrician or a developmental pediatrician as soon as possible.",
+        "Ask for a referral to a developmental specialist.",
+        "If your child has lost skills they previously had, treat this as urgent.",
+        "Check hearing and vision as a first step.",
+        "Write down all the specific concerns you have noticed to share with the specialist."
+      ],
+      "suggested_specialists": ["pediatrician", "dev_pediatrician", "speech_therapist", "child_psychologist", "audiologist", "vision"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 5,
+    "fields": {
+      "risk_level": "orange",
+      "concern_tag": "asd",
+      "heading": "Some responses suggest a social communication pattern worth reviewing",
+      "message": "Your child's responses show a pattern in areas related to social communication, eye contact, language, or play. This pattern may be worth discussing with a specialist. We are not saying your child has autism — only a qualified professional can assess that. But early evaluation is important because, if support is needed, starting it early leads to much better outcomes. Please speak with your pediatrician and ask about a developmental or autism-specific screening.",
+      "action_items": [
+        "Speak with your pediatrician and mention concerns about social communication and eye contact.",
+        "Ask for a referral to a developmental pediatrician or child psychologist.",
+        "Encourage simple back-and-forth play and conversation at home.",
+        "Keep routines predictable — this helps children who struggle with change.",
+        "Note specific behaviors you have observed to share with the specialist."
+      ],
+      "suggested_specialists": ["pediatrician", "dev_pediatrician", "child_psychologist", "speech_therapist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 6,
+    "fields": {
+      "risk_level": "red",
+      "concern_tag": "asd",
+      "heading": "We recommend an autism-specific developmental evaluation soon",
+      "message": "Your child's responses show several patterns associated with social communication difficulties, including concerns about eye contact, back-and-forth interaction, language, pretend play, or rigid routines. This does not mean your child has autism — only a qualified clinician can make that determination. However, these patterns together suggest that an evaluation should happen soon. Early identification and early support lead to significantly better outcomes for children. Please contact your pediatrician this week and ask for an urgent developmental referral.",
+      "action_items": [
+        "Contact your pediatrician this week and request an urgent developmental referral.",
+        "Ask specifically about autism-specific screening tools such as the M-CHAT.",
+        "Request a referral to a developmental pediatrician or child psychiatrist.",
+        "Also consider a speech-language evaluation given the communication concerns.",
+        "Keep a video diary of specific behaviors to show the specialist — this can be very helpful."
+      ],
+      "suggested_specialists": ["dev_pediatrician", "child_psychiatrist", "child_psychologist", "speech_therapist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 7,
+    "fields": {
+      "risk_level": "orange",
+      "concern_tag": "adhd",
+      "heading": "Some responses suggest attention and activity patterns worth reviewing",
+      "message": "Your child's responses show a pattern of difficulty with attention, activity level, or impulse control that appears to be affecting daily life at home or at school. Many children are naturally active and distractible, but when these patterns are persistent and happening across multiple settings, it may be worth a closer look. Please speak with your pediatrician and mention these concerns. A referral to a child psychologist or developmental pediatrician can help clarify what is happening.",
+      "action_items": [
+        "Speak with your pediatrician about attention and behavior concerns.",
+        "Ask the child's teacher or preschool if they notice similar patterns at school.",
+        "Keep routines structured and consistent — this helps children who struggle with attention.",
+        "Break tasks into small steps and give one instruction at a time.",
+        "Ask about a referral to a child psychologist for a behavioral assessment."
+      ],
+      "suggested_specialists": ["pediatrician", "child_psychologist", "dev_pediatrician"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 8,
+    "fields": {
+      "risk_level": "red",
+      "concern_tag": "adhd",
+      "heading": "We recommend an attention and behavior evaluation soon",
+      "message": "Your child's responses show significant and persistent patterns of inattention, hyperactivity, or impulsivity that appear to be clearly interfering with daily life, learning, or social functioning. This does not mean your child has ADHD — only a qualified professional can assess that. But these patterns, especially when they occur across home and school settings, warrant a proper evaluation. Please contact your pediatrician and request a referral for a behavioral or developmental assessment.",
+      "action_items": [
+        "Contact your pediatrician and ask for a behavioral or developmental assessment.",
+        "Request a referral to a child psychologist or developmental pediatrician.",
+        "Ask your child's teacher to complete a behavior rating scale — the specialist will likely ask for this.",
+        "Keep a log of specific behaviors, how often they occur, and in what situations.",
+        "Structure and consistent routines are very helpful in the meantime."
+      ],
+      "suggested_specialists": ["pediatrician", "child_psychologist", "dev_pediatrician", "child_psychiatrist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 9,
+    "fields": {
+      "risk_level": "orange",
+      "concern_tag": "dyslexia",
+      "heading": "Some responses suggest early reading and language patterns worth monitoring",
+      "message": "Your child's responses show some difficulty with letter recognition, sound awareness, rhyming, or early reading skills. These are areas where early support makes the biggest difference. Difficulty in these areas does not mean your child cannot learn to read — it means they may need a different approach or additional support. Please speak with your child's teacher and your pediatrician. An assessment by a speech-language pathologist can help identify any underlying language or phonological difficulties.",
+      "action_items": [
+        "Speak with your child's teacher about the specific difficulties you have noticed.",
+        "Practice rhyming games, letter sounds, and reading aloud together daily.",
+        "Ask your pediatrician for a referral to a speech-language pathologist.",
+        "Check your child's hearing — hearing difficulties can affect reading and language development.",
+        "Ask the school about additional literacy support or early intervention."
+      ],
+      "suggested_specialists": ["speech_therapist", "pediatrician", "audiologist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 10,
+    "fields": {
+      "risk_level": "red",
+      "concern_tag": "dyslexia",
+      "heading": "We recommend a reading and language evaluation soon",
+      "message": "Your child's responses show significant difficulty with letter recognition, phonological awareness, reading, or spelling that is beyond what is expected for their age. These patterns may suggest a reading-related difficulty that would benefit from specialist assessment and targeted support. Early identification and the right teaching approach can make a very significant difference. Please speak with your child's school and your pediatrician about a formal language and literacy assessment.",
+      "action_items": [
+        "Contact your child's school and ask about a formal educational or literacy assessment.",
+        "Ask your pediatrician for a referral to a speech-language pathologist.",
+        "Have your child's hearing checked — this is an important first step.",
+        "Continue reading aloud together daily, even if your child finds it difficult.",
+        "Ask the school about specialist literacy programs or learning support."
+      ],
+      "suggested_specialists": ["speech_therapist", "pediatrician", "audiologist", "child_psychologist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 11,
+    "fields": {
+      "risk_level": "orange",
+      "concern_tag": "ocd",
+      "heading": "Some responses suggest anxiety or rigid behavior patterns worth reviewing",
+      "message": "Your child's responses show some patterns of repetitive behaviors, rigid routines, excessive checking, or significant distress when things do not go as expected. Some degree of rigidity and routine-preference is normal in young children, but when these patterns are time-consuming, very distressing, or are interfering with daily life, it is worth discussing with a professional. Please speak with your pediatrician and ask about a referral to a child psychologist.",
+      "action_items": [
+        "Speak with your pediatrician about the specific behaviors you have observed.",
+        "Ask for a referral to a child psychologist who works with anxiety and OCD.",
+        "Try to keep routines predictable while gently introducing small changes over time.",
+        "Avoid accommodating all rituals as this can reinforce the behavior.",
+        "Note how much time rituals or checking behaviors take up each day."
+      ],
+      "suggested_specialists": ["pediatrician", "child_psychologist", "child_psychiatrist"]
+    }
+  },
+  {
+    "model": "referrals.referralguidance",
+    "pk": 12,
+    "fields": {
+      "risk_level": "red",
+      "concern_tag": "ocd",
+      "heading": "We recommend an anxiety and behavior evaluation soon",
+      "message": "Your child's responses show significant patterns of repetitive behaviors, rituals, checking, or intense distress that appear to be interfering with daily life, school, or family functioning. These patterns may suggest anxiety or OCD-related concerns that would benefit from specialist evaluation. Only a qualified professional can assess this properly. Please contact your pediatrician this week and request a referral to a child psychologist or child psychiatrist.",
+      "action_items": [
+        "Contact your pediatrician this week and request an urgent referral.",
+        "Ask for a referral to a child psychologist or child psychiatrist experienced in anxiety and OCD.",
+        "Note specific rituals, how long they take, and how your child reacts when interrupted.",
+        "Try not to participate in or accommodate rituals — seek guidance from a professional on how to respond.",
+        "Be warm and supportive — children with these patterns are often distressed and need reassurance."
+      ],
+      "suggested_specialists": ["child_psychologist", "child_psychiatrist", "pediatrician"]
+    }
+  }
+]
