@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'assessments',
     'referrals',
     'core',
+    'infant_care',
 ]
 
 MIDDLEWARE = [
