@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>STARLET – Ages 3–7 Child Development Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f4ff; display: flex; justify-content: center;
+    align-items: center; min-height: 100vh; padding: 20px;
+  }
+
+  /* ── Phone Shell ── */
+  .phone {
+    width: 390px; height: 844px; background: #fff; border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.22), 0 0 0 10px #1a1a2e, 0 0 0 12px #333;
+    overflow: hidden; display: flex; flex-direction: column; position: relative;
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 30px; background: #1a1a2e; border-radius: 0 0 20px 20px; z-index: 100; }
+  .status-bar {
+    height: 44px; background: #fff; display: flex; align-items: flex-end;
+    justify-content: space-between; padding: 0 24px 6px;
+    font-size: 12px; font-weight: 600; color: #111; flex-shrink: 0;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+
+  /* ── Screens ── */
+  .screens { flex: 1; overflow: hidden; position: relative; }
+  .screen { position: absolute; inset: 0; overflow-y: auto; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    height: 72px; background: #fff; border-top: 1px solid #eee;
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; padding-bottom: 8px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; padding: 6px 10px; border-radius: 14px; transition: background .15s;
+  }
+  .nav-item:hover { background: #f5f7ff; }
+  .nav-item .nav-icon { font-size: 22px; }
+  .nav-item span { font-size: 10px; font-weight: 600; color: #999; }
+  .nav-item.active span { color: #7C3AED; }
+
+  /* ── Common ── */
+  .page-header {
+    padding: 16px 20px 14px;
+    background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+    color: #fff; flex-shrink: 0;
+  }
+  .page-header h1 { font-size: 22px; font-weight: 800; }
+  .page-header p  { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+  .chip { display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .chip-green  { background:#e6faf0; color:#16a34a; }
+  .chip-yellow { background:#fefce8; color:#ca8a04; }
+  .chip-orange { background:#fff7ed; color:#ea580c; }
+  .chip-red    { background:#fef2f2; color:#dc2626; }
+  .chip-blue   { background:#eff6ff; color:#2563eb; }
+  .chip-purple { background:#f5f3ff; color:#7c3aed; }
+  .section-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+
+  /* ════════════════ HOME ════════════════ */
+  #home .hero {
+    background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+    padding: 20px 20px 28px; color: #fff;
+  }
+  .hero-greeting { font-size: 14px; opacity: .85; }
+  .hero-name { font-size: 26px; font-weight: 800; margin: 2px 0 4px; }
+  .hero-sub  { font-size: 13px; opacity: .8; }
+  .child-card {
+    background: rgba(255,255,255,.18); border-radius: 20px;
+    padding: 14px; margin-top: 16px; display: flex; align-items: center; gap: 14px;
+  }
+  .child-avatar { width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(255,255,255,.3); display: flex; align-items: center;
+    justify-content: center; font-size: 28px; }
+  .child-info .c-name { font-size: 18px; font-weight: 700; }
+  .child-info .c-age  { font-size: 13px; opacity: .85; }
+  .child-info .c-dob  { font-size: 11px; opacity: .7; margin-top: 2px; }
+
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 16px; }
+  .stat-card {
+    background: #fff; border-radius: 16px; padding: 14px 10px;
+    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    cursor: pointer; transition: transform .15s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .s-icon { font-size: 22px; margin-bottom: 4px; }
+  .stat-card .s-val  { font-size: 20px; font-weight: 800; color: #7C3AED; }
+  .stat-card .s-lbl  { font-size: 10px; color: #888; font-weight: 600; margin-top: 2px; }
+
+  .age-summary { margin: 0 16px 12px; background: #f5f3ff; border-radius: 16px; padding: 14px; }
+  .as-label { font-size: 12px; font-weight: 700; color: #7C3AED; text-transform: uppercase; margin-bottom: 8px; }
+  .domain-bars { display: flex; flex-direction: column; gap: 7px; }
+  .db-row { display: flex; align-items: center; gap: 8px; }
+  .db-name { font-size: 11px; font-weight: 600; color: #555; width: 80px; flex-shrink: 0; }
+  .db-track { flex: 1; height: 8px; background: #e9d5ff; border-radius: 99px; }
+  .db-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#7C3AED,#EC4899); }
+  .db-pct   { font-size: 11px; font-weight: 700; color: #7C3AED; width: 30px; text-align: right; }
+
+  .today-list { padding: 0 16px 16px; }
+  .today-list h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #1a1a2e; }
+  .today-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; background: #fff; border-radius: 14px;
+    margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .t-icon { width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .t-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+  .t-sub   { font-size: 12px; color: #888; margin-top: 1px; }
+  .t-badge { margin-left: auto; }
+
+  /* ════════════════ MILESTONES ════════════════ */
+  #milestones .age-selector {
+    background: #fff; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+  }
+  #milestones .age-selector label {
+    font-size: 12px; font-weight: 700; color: #888;
+    text-transform: uppercase; display: block; margin-bottom: 8px;
+  }
+  .age-pills { display: flex; gap: 8px; }
+  .age-pill {
+    flex: 1; padding: 10px 4px; border-radius: 14px; font-size: 13px; font-weight: 700;
+    cursor: pointer; background: #f3f4f6; color: #666; border: none;
+    transition: all .15s; text-align: center;
+  }
+  .age-pill.active { background: linear-gradient(135deg, #7C3AED, #EC4899); color: #fff; }
+
+  #milestones .m-body { flex: 1; overflow-y: auto; padding: 14px; }
+  #milestones .m-body::-webkit-scrollbar { display: none; }
+
+  .risk-banner {
+    border-radius: 14px; padding: 12px 14px;
+    display: flex; gap: 10px; align-items: center; margin-bottom: 14px;
+  }
+  .risk-banner.green  { background: #e6faf0; }
+  .risk-banner.yellow { background: #fefce8; }
+  .risk-banner.orange { background: #fff7ed; }
+  .risk-banner.red    { background: #fef2f2; }
+  .risk-banner .rb-icon  { font-size: 24px; }
+  .risk-banner .rb-title { font-size: 13px; font-weight: 700; }
+  .risk-banner .rb-sub   { font-size: 11px; opacity: .8; margin-top: 2px; }
+  .risk-banner.green  .rb-title { color: #16a34a; }
+  .risk-banner.yellow .rb-title { color: #ca8a04; }
+  .risk-banner.orange .rb-title { color: #ea580c; }
+  .risk-banner.red    .rb-title { color: #dc2626; }
+
+  .domain-block { margin-bottom: 16px; }
+  .domain-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px;
+  }
+  .domain-badge { width: 30px; height: 30px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+  /* ── Milestone item with practice button ── */
+  .m-item {
+    background: #fff; border-radius: 12px; margin-bottom: 6px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.05); overflow: hidden;
+  }
+  .m-item-row {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; cursor: pointer;
+    transition: background .1s;
+  }
+  .m-item-row:hover { background: #fafafa; }
+  .m-check {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid #d1d5db;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0; margin-top: 1px; transition: all .2s;
+  }
+  .m-item.met       .m-check { background: #16a34a; border-color: #16a34a; color: #fff; }
+  .m-item.emerging  .m-check { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+  .m-item.not-yet   .m-check { background: #fff; border-color: #d1d5db; }
+  .m-item.concerned .m-check { background: #dc2626; border-color: #dc2626; color: #fff; }
+  .m-item .m-title  { font-size: 13px; font-weight: 600; color: #1a1a2e; line-height: 1.4; }
+  .m-item .m-status { font-size: 11px; margin-top: 3px; font-weight: 600; }
+  .m-item.met       .m-status { color: #16a34a; }
+  .m-item.emerging  .m-status { color: #f59e0b; }
+  .m-item.not-yet   .m-status { color: #9ca3af; }
+  .m-item.concerned .m-status { color: #dc2626; }
+
+  /* Practice strip — shown when not-yet or concerned */
+  .practice-strip {
+    display: none; border-top: 1px solid #f3f4f6;
+    padding: 8px 12px; background: #fafafa;
+    align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .m-item.not-yet   .practice-strip { display: flex; }
+  .m-item.concerned .practice-strip { display: flex; background: #fef2f2; }
+  .m-item.emerging  .practice-strip { display: flex; background: #fefce8; }
+
+  .practice-strip .ps-left { display: flex; flex-direction: column; }
+  .practice-strip .ps-tag  {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  }
+  .m-item.not-yet   .ps-tag { color: #6b7280; }
+  .m-item.emerging  .ps-tag { color: #ca8a04; }
+  .m-item.concerned .ps-tag { color: #dc2626; }
+
+  .practice-strip .ps-plan { font-size: 11px; color: #555; margin-top: 2px; }
+  .practice-strip .ps-plan.overdue { color: #dc2626; font-weight: 700; }
+
+  .practice-btn {
+    padding: 5px 12px; border-radius: 8px; border: none; font-size: 11px;
+    font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .practice-btn.start  { background: #7C3AED; color: #fff; }
+  .practice-btn.active { background: #f59e0b; color: #fff; }
+  .practice-btn.consult { background: #dc2626; color: #fff; }
+
+  /* ════════════════ RED FLAGS ════════════════ */
+  #redflags .rf-body { flex: 1; overflow-y: auto; padding: 14px; }
+  #redflags .rf-body::-webkit-scrollbar { display: none; }
+  .rf-intro { background: #fef2f2; border-radius: 14px; padding: 12px 14px;
+    margin-bottom: 16px; border-left: 4px solid #dc2626; }
+  .rf-intro p { font-size: 12px; color: #7f1d1d; line-height: 1.5; }
+  .rf-category { margin-bottom: 20px; }
+  .rf-category-title { font-size: 13px; font-weight: 700; color: #1a1a2e;
+    display: flex; align-items: center; gap: 7px; margin-bottom: 10px; }
+  .rf-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; background: #fff; border-radius: 12px;
+    margin-bottom: 6px; box-shadow: 0 1px 6px rgba(0,0,0,.05); cursor: pointer;
+  }
+  .rf-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #d1d5db;
+    flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; transition: all .2s; }
+  .rf-item.flagged .rf-checkbox { background: #dc2626; border-color: #dc2626; color: #fff; }
+  .rf-text { font-size: 13px; color: #374151; line-height: 1.4; font-weight: 500; }
+  .rf-result-bar { background: #fff; border-radius: 16px; padding: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 14px;
+    border: 2px solid #e5e7eb; display: none; }
+  .rf-result-bar.show { display: block; }
+  .rf-result-bar .rr-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .rf-result-bar .rr-sub   { font-size: 12px; color: #666; }
+  .referral-btn { width: 100%; padding: 13px; background: linear-gradient(135deg,#dc2626,#ea580c);
+    color: #fff; border: none; border-radius: 12px; font-size: 14px;
+    font-weight: 700; cursor: pointer; margin-top: 12px; }
+  .pattern-card { border-radius: 16px; padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+  .pattern-card .pc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .pattern-card .pc-icon { font-size: 22px; }
+  .pattern-card .pc-name { font-size: 14px; font-weight: 700; }
+  .pattern-card .pc-sub  { font-size: 11px; color: #888; }
+  .pattern-card .pc-body { font-size: 12px; line-height: 1.6; color: #555; }
+  .pattern-card.asd  { background: #fdf2f8; border-left: 4px solid #db2777; }
+  .pattern-card.adhd { background: #fff7ed; border-left: 4px solid #ea580c; }
+  .pattern-card.dys  { background: #eff6ff; border-left: 4px solid #2563eb; }
+  .pattern-card.ocd  { background: #f5f3ff; border-left: 4px solid #7c3aed; }
+  .pattern-card.asd  .pc-name { color: #db2777; }
+  .pattern-card.adhd .pc-name { color: #ea580c; }
+  .pattern-card.dys  .pc-name { color: #2563eb; }
+  .pattern-card.ocd  .pc-name { color: #7c3aed; }
+
+  /* ════════════════ PROGRESS ════════════════ */
+  #progress .p-body { flex: 1; overflow-y: auto; padding: 14px; }
+  #progress .p-body::-webkit-scrollbar { display: none; }
+  .score-circle-wrap { display: flex; justify-content: center; margin-bottom: 16px; }
+  .score-circle { width: 120px; height: 120px; border-radius: 50%;
+    background: conic-gradient(#7C3AED 0% 74%, #e9d5ff 74% 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(124,58,237,.3); }
+  .score-inner { width: 88px; height: 88px; border-radius: 50%; background: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-inner .s-num { font-size: 28px; font-weight: 800; color: #7C3AED; }
+  .score-inner .s-lbl { font-size: 10px; color: #888; font-weight: 600; }
+  .domain-progress { background: #fff; border-radius: 16px; padding: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 12px; }
+  .dp-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .dp-row:last-child { margin-bottom: 0; }
+  .dp-icon { font-size: 20px; width: 30px; text-align: center; }
+  .dp-info { flex: 1; }
+  .dp-name  { font-size: 12px; font-weight: 700; color: #1a1a2e; }
+  .dp-track { height: 8px; background: #f0f0f0; border-radius: 99px; margin-top: 4px; }
+  .dp-fill  { height: 100%; border-radius: 99px; transition: width .5s;
+    background: linear-gradient(90deg,#7C3AED,#EC4899); }
+  .dp-fill.warn { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+  .dp-fill.good { background: linear-gradient(90deg,#16a34a,#22c55e); }
+  .dp-pct { font-size: 12px; font-weight: 700; color: #7C3AED; width: 32px; text-align: right; }
+  .history-entry { display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; background: #fff; border-radius: 14px;
+    margin-bottom: 8px; box-shadow: 0 1px 6px rgba(0,0,0,.05); }
+  .he-dot { width: 10px; height: 10px; border-radius: 50%; background: #7C3AED;
+    margin-top: 5px; flex-shrink: 0; }
+  .he-dot.warn { background: #f59e0b; }
+  .he-title { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .he-sub   { font-size: 11px; color: #888; margin-top: 2px; }
+  .specialist-card { background: #fff; border-radius: 14px; padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px; }
+  .sp-icon { font-size: 22px; width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; background: #f5f3ff; }
+  .sp-name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .sp-role { font-size: 11px; color: #888; margin-top: 2px; }
+  .sp-btn  { margin-left: auto; padding: 6px 14px; background: #7C3AED;
+    color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+  /* ════════════════ PRACTICE MODAL ════════════════ */
+  .modal-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: flex-end; z-index: 200;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    width: 100%; background: #fff; border-radius: 24px 24px 0 0;
+    padding: 20px; max-height: 82%; overflow-y: auto;
+    animation: slideUp .25s ease;
+  }
+  .modal-sheet::-webkit-scrollbar { display: none; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 36px; height: 4px; background: #e5e7eb;
+    border-radius: 2px; margin: 0 auto 16px; }
+
+  /* Practice modal header */
+  .pm-header { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+  .pm-icon { width: 46px; height: 46px; border-radius: 14px; font-size: 22px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pm-title { font-size: 17px; font-weight: 800; color: #1a1a2e; line-height: 1.3; }
+  .pm-age   { font-size: 11px; color: #888; margin-top: 3px; }
+
+  /* Status ribbon */
+  .pm-status-ribbon {
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pm-status-ribbon.not-yet   { background: #f3f4f6; }
+  .pm-status-ribbon.emerging  { background: #fefce8; }
+  .pm-status-ribbon.concerned { background: #fef2f2; }
+  .psr-text .psr-label { font-size: 13px; font-weight: 700; }
+  .psr-text .psr-sub   { font-size: 11px; color: #666; margin-top: 2px; }
+  .pm-status-ribbon.not-yet   .psr-label { color: #6b7280; }
+  .pm-status-ribbon.emerging  .psr-label { color: #ca8a04; }
+  .pm-status-ribbon.concerned .psr-label { color: #dc2626; }
+
+  /* Plan countdown */
+  .plan-countdown {
+    background: linear-gradient(135deg,#7C3AED,#EC4899);
+    border-radius: 14px; padding: 14px; color: #fff; margin-bottom: 16px;
+    display: none;
+  }
+  .plan-countdown.show { display: block; }
+  .pc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .pc-days { font-size: 30px; font-weight: 800; }
+  .pc-unit { font-size: 13px; opacity: .8; }
+  .pc-label { font-size: 12px; opacity: .85; margin-top: 4px; }
+  .pc-prog-bg  { height: 6px; background: rgba(255,255,255,.3); border-radius: 99px; margin-top: 10px; }
+  .pc-prog-fill { height: 100%; background: #fff; border-radius: 99px; transition: width .5s; }
+
+  /* Overdue plan */
+  .plan-overdue {
+    background: #fef2f2; border: 2px solid #dc2626; border-radius: 14px;
+    padding: 14px; margin-bottom: 16px; display: none;
+  }
+  .plan-overdue.show { display: block; }
+  .po-title { font-size: 14px; font-weight: 800; color: #dc2626; margin-bottom: 4px; }
+  .po-sub   { font-size: 12px; color: #7f1d1d; line-height: 1.5; }
+  .consult-btn {
+    width: 100%; padding: 13px; background: #dc2626; color: #fff;
+    border: none; border-radius: 12px; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 10px;
+  }
+
+  /* Practice activities */
+  .activities-label { font-size: 12px; font-weight: 700; color: #888;
+    text-transform: uppercase; letter-spacing: .4px; margin-bottom: 10px; }
+  .activity-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px; background: #f9fafb; border-radius: 12px;
+    margin-bottom: 8px; border-left: 3px solid #7C3AED;
+  }
+  .activity-item .a-num {
+    width: 24px; height: 24px; border-radius: 50%; background: #7C3AED;
+    color: #fff; font-size: 11px; font-weight: 700; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .activity-item .a-text { flex: 1; }
+  .activity-item .a-title { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+  .activity-item .a-desc  { font-size: 12px; color: #555; margin-top: 3px; line-height: 1.4; }
+  .activity-item .a-freq  { font-size: 10px; font-weight: 700; color: #7C3AED;
+    margin-top: 4px; }
+
+  /* Duration selector */
+  .duration-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .dur-btn { flex: 1; padding: 8px; border-radius: 10px; border: 2px solid #e5e7eb;
+    font-size: 12px; font-weight: 700; color: #666; background: #fff; cursor: pointer;
+    text-align: center; transition: all .15s; }
+  .dur-btn.active { border-color: #7C3AED; background: #f5f3ff; color: #7C3AED; }
+
+  /* Start button */
+  .start-plan-btn {
+    width: 100%; padding: 14px; background: linear-gradient(135deg,#7C3AED,#EC4899);
+    color: #fff; border: none; border-radius: 14px; font-size: 15px;
+    font-weight: 700; cursor: pointer; margin-top: 4px;
+  }
+  .modal-cancel { display: block; text-align: center; margin-top: 12px;
+    font-size: 13px; color: #888; cursor: pointer; }
+
+  /* Referral modal */
+  .ref-modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #1a1a2e; }
+  .ref-modal-sub   { font-size: 12px; color: #888; margin-bottom: 16px; }
+  .ref-option { padding: 12px 14px; border-radius: 12px; border: 1.5px solid #e5e7eb;
+    cursor: pointer; transition: all .15s; margin-bottom: 8px; }
+  .ref-option:hover { border-color: #7C3AED; background: #f5f3ff; }
+  .ref-option .ro-name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .ref-option .ro-desc { font-size: 11px; color: #888; margin-top: 2px; }
+
+  /* Toast */
+  .toast {
+    position: absolute; bottom: 88px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e; color: #fff; padding: 10px 20px; border-radius: 12px;
+    font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: all .3s; white-space: nowrap; z-index: 300;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px">●●●</span> 🔋</div>
+  </div>
+
+  <div class="screens">
+
+    <!-- ══════ HOME ══════ -->
+    <div class="screen active" id="home">
+      <div class="hero">
+        <div class="hero-greeting">Good morning, Anjela 👋</div>
+        <div class="hero-name">Starlet App</div>
+        <div class="hero-sub">Child Development Tracker · Ages 3–7</div>
+        <div class="child-card">
+          <div class="child-avatar">🧒</div>
+          <div class="child-info">
+            <div class="c-name">Lucas</div>
+            <div class="c-age">5 years old · Kindergarten</div>
+            <div class="c-dob">Born July 12, 2021</div>
+          </div>
+          <div style="margin-left:auto"><span class="chip chip-yellow">2 Plans Active</span></div>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+        <div class="stat-card" onclick="switchTab('milestones')">
+          <div class="s-icon">🎯</div><div class="s-val">74%</div><div class="s-lbl">Milestones</div>
+        </div>
+        <div class="stat-card" onclick="switchTab('milestones')">
+          <div class="s-icon">🏋️</div><div class="s-val" style="color:#ea580c">2</div><div class="s-lbl">Active Plans</div>
+        </div>
+        <div class="stat-card" onclick="switchTab('redflags')">
+          <div class="s-icon">🚩</div><div class="s-val" style="color:#dc2626">3</div><div class="s-lbl">Red Flags</div>
+        </div>
+      </div>
+
+      <div class="age-summary">
+        <div class="as-label">Age 5 Domain Summary</div>
+        <div class="domain-bars">
+          <div class="db-row"><span class="db-name">Social</span><div class="db-track"><div class="db-fill" style="width:80%"></div></div><span class="db-pct">80%</span></div>
+          <div class="db-row"><span class="db-name">Language</span><div class="db-track"><div class="db-fill" style="width:90%"></div></div><span class="db-pct">90%</span></div>
+          <div class="db-row"><span class="db-name">Cognitive</span><div class="db-track"><div class="db-fill" style="width:67%"></div></div><span class="db-pct">67%</span></div>
+          <div class="db-row"><span class="db-name">Motor</span><div class="db-track"><div class="db-fill" style="width:57%"></div></div><span class="db-pct">57%</span></div>
+        </div>
+      </div>
+
+      <div class="today-list">
+        <h3>Active Practice Plans</h3>
+        <div class="today-item">
+          <div class="t-icon" style="background:#f5f3ff">🏋️</div>
+          <div>
+            <div class="t-title">Skipping Practice</div>
+            <div class="t-sub">Day 8 of 21 · Motor — Age 5</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-purple">13 days left</span></div>
+        </div>
+        <div class="today-item">
+          <div class="t-icon" style="background:#fff7ed">📚</div>
+          <div>
+            <div class="t-title">Letter Recognition</div>
+            <div class="t-sub">Day 3 of 28 · Cognitive — Age 5</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-orange">25 days left</span></div>
+        </div>
+        <div class="today-item">
+          <div class="t-icon" style="background:#e6faf0">✅</div>
+          <div>
+            <div class="t-title">Classroom Routines — Resolved</div>
+            <div class="t-sub">Met milestone after 14-day plan</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-green">Done</span></div>
+        </div>
+        <div class="today-item">
+          <div class="t-icon" style="background:#fef2f2">🔔</div>
+          <div>
+            <div class="t-title">Hanging from Bar — Overdue</div>
+            <div class="t-sub">28-day plan ended · Not yet met</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-red">Consult</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ MILESTONES ══════ -->
+    <div class="screen" id="milestones">
+      <div class="page-header">
+        <h1>Milestone Checklist</h1>
+        <p>Tap status circle to update · Tap "Practice" for activities</p>
+      </div>
+      <div class="age-selector">
+        <label>Select Age Group</label>
+        <div class="age-pills">
+          <button class="age-pill" onclick="setAge(3)">Age 3</button>
+          <button class="age-pill" onclick="setAge(4)">Age 4</button>
+          <button class="age-pill active" onclick="setAge(5)">Age 5</button>
+          <button class="age-pill" onclick="setAge(6)">Age 6</button>
+          <button class="age-pill" onclick="setAge(7)">Age 7</button>
+        </div>
+      </div>
+      <div class="m-body" id="m-body"></div>
+    </div>
+
+    <!-- ══════ RED FLAGS ══════ -->
+    <div class="screen" id="redflags">
+      <div class="page-header">
+        <h1>Red Flag Alerts</h1>
+        <p>Check any concern you've observed · Not a diagnosis</p>
+      </div>
+      <div class="rf-body">
+        <div class="rf-intro">
+          <p>🛡️ <strong>Screening only.</strong> Flags concerns that may need professional review. Does not diagnose. Act early if you see regression, multi-domain delays, or persistent concerns.</p>
+        </div>
+        <div class="rf-result-bar" id="rf-result">
+          <div class="rr-title" id="rf-result-title">⚠️ 3 Concerns Flagged</div>
+          <div class="rr-sub" id="rf-result-sub">Repeated concerns may benefit from developmental screening.</div>
+          <button class="referral-btn" onclick="openRefModal()">View Specialist Referrals →</button>
+        </div>
+        <div class="rf-category">
+          <div class="rf-category-title">🌐 Global Red Flags</div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Loss of previously learned skills at any age</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Delay in more than one domain (e.g. speech + motor)</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">No progress over time, or developmental arrest</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Persistent parental concern over time</div></div>
+        </div>
+        <div class="rf-category">
+          <div class="rf-category-title">💬 Social & Communication</div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Poor eye contact or limited social response</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Not pointing to show interest or share attention</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Limited pretend play or very restricted interests</div></div>
+          <div class="rf-item flagged" onclick="toggleFlag(this)"><div class="rf-checkbox">✓</div><div class="rf-text">Speech hard to understand compared to age expectations</div></div>
+        </div>
+        <div class="rf-category">
+          <div class="rf-category-title">📚 Learning & School Readiness</div>
+          <div class="rf-item flagged" onclick="toggleFlag(this)"><div class="rf-checkbox">✓</div><div class="rf-text">Trouble recognizing letters, sounds, or rhyming</div></div>
+          <div class="rf-item flagged" onclick="toggleFlag(this)"><div class="rf-checkbox">✓</div><div class="rf-text">Ongoing difficulty following instructions or routines</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Problems with early reading, spelling, or word decoding</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Attention/impulsivity interfering with home or school</div></div>
+        </div>
+        <div class="rf-category">
+          <div class="rf-category-title">🏃 Motor & Physical</div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Very poor balance, clumsiness, or movement asymmetry</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Difficulty with stairs, jumping, or self-care beyond expected age</div></div>
+        </div>
+        <div class="rf-category">
+          <div class="rf-category-title">🧠 Emotional & Behavior</div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Severe, frequent tantrums that are hard to calm</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Extreme rigidity or intense distress with routine changes</div></div>
+          <div class="rf-item" onclick="toggleFlag(this)"><div class="rf-checkbox"></div><div class="rf-text">Persistent anxiety or withdrawal affecting daily life</div></div>
+        </div>
+        <div class="section-title">🔬 Condition Pattern Watch</div>
+        <p style="font-size:12px;color:#888;margin-bottom:12px">Patterns to discuss with a specialist — not diagnoses.</p>
+        <div class="pattern-card asd">
+          <div class="pc-header"><span class="pc-icon">🧩</span><div><div class="pc-name">Autism Spectrum</div><div class="pc-sub">Social-communication pattern</div></div></div>
+          <div class="pc-body">Limited eye contact · Poor social reciprocity · Delayed language · Repetitive behaviors · Rigid routines · Limited pretend play</div>
+        </div>
+        <div class="pattern-card adhd">
+          <div class="pc-header"><span class="pc-icon">⚡</span><div><div class="pc-name">ADHD</div><div class="pc-sub">Attention & impulsivity pattern</div></div></div>
+          <div class="pc-body">Persistent inattention · Hyperactivity · Impulsivity · Difficulty waiting/listening · Trouble completing tasks across settings</div>
+        </div>
+        <div class="pattern-card dys">
+          <div class="pc-header"><span class="pc-icon">📖</span><div><div class="pc-name">Dyslexia</div><div class="pc-sub">Reading & language pattern</div></div></div>
+          <div class="pc-body">Trouble with rhyming · Weak sound-letter awareness · Difficulty learning letters · Later reading and spelling concerns</div>
+        </div>
+        <div class="pattern-card ocd">
+          <div class="pc-header"><span class="pc-icon">🔁</span><div><div class="pc-name">OCD</div><div class="pc-sub">Repetitive behavior pattern</div></div></div>
+          <div class="pc-body">Repetitive checking · Time-consuming rituals · Intense distress when routines change · Compulsions that interfere with daily life</div>
+        </div>
+        <div style="height:16px"></div>
+      </div>
+    </div>
+
+    <!-- ══════ PROGRESS ══════ -->
+    <div class="screen" id="progress">
+      <div class="page-header"><h1>Progress & Reports</h1><p>Lucas · Age 5 · Assessment history</p></div>
+      <div class="p-body">
+        <div class="score-circle-wrap">
+          <div class="score-circle">
+            <div class="score-inner"><div class="s-num">74</div><div class="s-lbl">Overall %</div></div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-bottom:16px">
+          <span class="chip chip-yellow">⚠️ Monitor — 2 active practice plans</span>
+        </div>
+        <div class="section-title">📊 Domain Breakdown</div>
+        <div class="domain-progress">
+          <div class="dp-row"><div class="dp-icon">❤️</div><div class="dp-info"><div class="dp-name">Social & Emotional</div><div class="dp-track"><div class="dp-fill good" style="width:80%"></div></div></div><div class="dp-pct">80%</div></div>
+          <div class="dp-row"><div class="dp-icon">💬</div><div class="dp-info"><div class="dp-name">Language & Communication</div><div class="dp-track"><div class="dp-fill good" style="width:90%"></div></div></div><div class="dp-pct">90%</div></div>
+          <div class="dp-row"><div class="dp-icon">🧠</div><div class="dp-info"><div class="dp-name">Cognitive / Early Learning</div><div class="dp-track"><div class="dp-fill warn" style="width:67%"></div></div></div><div class="dp-pct" style="color:#f59e0b">67%</div></div>
+          <div class="dp-row"><div class="dp-icon">🏃</div><div class="dp-info"><div class="dp-name">Physical & Motor</div><div class="dp-track"><div class="dp-fill warn" style="width:57%"></div></div></div><div class="dp-pct" style="color:#f59e0b">57%</div></div>
+        </div>
+        <div class="section-title">🗓️ Assessment History</div>
+        <div class="history-entry"><div class="he-dot"></div><div><div class="he-title">Age 5 Assessment — 74%</div><div class="he-sub">July 12, 2026 · 2 active practice plans</div></div></div>
+        <div class="history-entry"><div class="he-dot"></div><div><div class="he-title">Age 4 Full Review — 88%</div><div class="he-sub">March 3, 2026 · Green · All domains on track</div></div></div>
+        <div class="history-entry"><div class="he-dot warn"></div><div><div class="he-title">Age 4 Midpoint — 71%</div><div class="he-sub">Dec 10, 2025 · Motor plan started · Resolved</div></div></div>
+        <div class="history-entry"><div class="he-dot"></div><div><div class="he-title">Age 3 Assessment — 92%</div><div class="he-sub">Aug 1, 2025 · Green · Strong social & language</div></div></div>
+        <div class="section-title" style="margin-top:4px">👨‍⚕️ Specialist Finder</div>
+        <div class="specialist-card"><div class="sp-icon">🏥</div><div><div class="sp-name">Developmental Pediatrician</div><div class="sp-role">Comprehensive development evaluation</div></div><button class="sp-btn" onclick="showToast('Searching nearby…')">Find</button></div>
+        <div class="specialist-card"><div class="sp-icon">🗣️</div><div><div class="sp-name">Speech-Language Pathologist</div><div class="sp-role">Language, literacy & communication</div></div><button class="sp-btn" onclick="showToast('Searching nearby…')">Find</button></div>
+        <div class="specialist-card"><div class="sp-icon">🖐️</div><div><div class="sp-name">Occupational Therapist</div><div class="sp-role">Fine motor & self-care skills</div></div><button class="sp-btn" onclick="showToast('Searching nearby…')">Find</button></div>
+        <div style="height:16px"></div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-home"       onclick="switchTab('home')">      <div class="nav-icon">🏠</div><span>Home</span></div>
+    <div class="nav-item"        id="nav-milestones" onclick="switchTab('milestones')"><div class="nav-icon">🎯</div><span>Milestones</span></div>
+    <div class="nav-item"        id="nav-redflags"   onclick="switchTab('redflags')">  <div class="nav-icon">🚩</div><span>Red Flags</span></div>
+    <div class="nav-item"        id="nav-progress"   onclick="switchTab('progress')">  <div class="nav-icon">📊</div><span>Progress</span></div>
+  </div>
+
+  <!-- ══ Practice Plan Modal ══ -->
+  <div class="modal-overlay" id="practice-modal" onclick="closePracticeOutside(event)">
+    <div class="modal-sheet" id="practice-sheet">
+      <div class="modal-handle"></div>
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- ══ Referral Modal ══ -->
+  <div class="modal-overlay" id="ref-modal" onclick="closeRefOutside(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="ref-modal-title">Recommended Specialists</div>
+      <div class="ref-modal-sub">Based on the concerns you flagged:</div>
+      <div class="ref-option" onclick="showToast('Booking Speech Pathologist…');closeRefModal()"><div class="ro-name">🗣️ Speech-Language Pathologist</div><div class="ro-desc">For speech clarity and language understanding concerns</div></div>
+      <div class="ref-option" onclick="showToast('Booking Ed. Psychologist…');closeRefModal()"><div class="ro-name">📚 Educational Psychologist</div><div class="ro-desc">For reading, spelling, and learning difficulty screening</div></div>
+      <div class="ref-option" onclick="showToast('Booking Dev. Pediatrician…');closeRefModal()"><div class="ro-name">🏥 Developmental Pediatrician</div><div class="ro-desc">Comprehensive developmental and behavioural evaluation</div></div>
+      <div class="ref-option" onclick="showToast('Booking Audiologist…');closeRefModal()"><div class="ro-name">👂 Audiologist</div><div class="ro-desc">Rule out hearing issues as a cause of speech concerns</div></div>
+      <span class="modal-cancel" onclick="closeRefModal()">Cancel</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  MILESTONE DATA  (Ages 3–7, CDC/NHS)
+// ═══════════════════════════════════════
+const milestoneData = {
+  3:{label:"Age 3",risk:{level:"green",text:"On Track",sub:"Lucas met most Age 3 milestones!"},domains:[
+    {name:"Social & Emotional",icon:"❤️",color:"#fef2f2",items:[
+      {text:"Calms down within 10 minutes after separation from a caregiver",status:"met"},
+      {text:"Notices other children and joins them in play",status:"met"}]},
+    {name:"Language & Communication",icon:"💬",color:"#eff6ff",items:[
+      {text:"Uses conversation with at least two back-and-forth exchanges",status:"met"},
+      {text:"Asks 'who,' 'what,' 'where,' or 'why' questions",status:"met"},
+      {text:"Says what action is happening in a picture or book",status:"met"},
+      {text:"Says first name when asked",status:"met"},
+      {text:"Speaks well enough for others to understand most of the time",status:"met"}]},
+    {name:"Cognitive",icon:"🧠",color:"#f5f3ff",items:[
+      {text:"Draws a circle when shown how",status:"met"},
+      {text:"Avoids touching hot objects when warned",status:"met"}]},
+    {name:"Physical & Self-Help",icon:"💪",color:"#f0fdf4",items:[
+      {text:"Strings large beads or similar items together",status:"met"},
+      {text:"Puts on some clothes, such as loose pants or a jacket",status:"met"},
+      {text:"Uses a fork",status:"emerging"}]}]},
+  4:{label:"Age 4",risk:{level:"green",text:"On Track",sub:"Lucas met most Age 4 milestones."},domains:[
+    {name:"Social & Emotional",icon:"❤️",color:"#fef2f2",items:[
+      {text:"Plays cooperatively with other children",status:"met"},
+      {text:"Adapts to simple rules and routines",status:"met"}]},
+    {name:"Language & Communication",icon:"💬",color:"#eff6ff",items:[
+      {text:"Speaks in longer, clearer sentences",status:"met"},
+      {text:"Tells simple stories and answers questions about events",status:"met"},
+      {text:"Understands and follows 2-step directions",status:"met"}]},
+    {name:"Cognitive",icon:"🧠",color:"#f5f3ff",items:[
+      {text:"Copies a square",status:"met"},
+      {text:"Identifies basic concepts such as same/different and simple opposites",status:"met"},
+      {text:"Begins counting and matching activities",status:"emerging"}]},
+    {name:"Physical & Motor",icon:"💪",color:"#f0fdf4",items:[
+      {text:"Stands on one foot for up to 5 seconds",status:"met"},
+      {text:"Kicks a ball forward",status:"met"},
+      {text:"Throws a ball overhand",status:"met"},
+      {text:"Catches a bounced ball",status:"met"},
+      {text:"Runs around obstacles",status:"met"},
+      {text:"Walks on a line",status:"met"},
+      {text:"Hops on one foot",status:"emerging"},
+      {text:"Jumps over an object and lands with both feet together",status:"met"}]}]},
+  5:{label:"Age 5",risk:{level:"yellow",text:"Monitor — 1 Domain Needs Attention",sub:"Letter/sound recognition is emerging. Start a practice plan."},domains:[
+    {name:"Social & Emotional",icon:"❤️",color:"#fef2f2",items:[
+      {text:"Plays in groups and takes turns more reliably",status:"met"},
+      {text:"Separates from caregivers with less distress",status:"met"},
+      {text:"Follows classroom routines with support",status:"emerging"}]},
+    {name:"Language & Communication",icon:"💬",color:"#eff6ff",items:[
+      {text:"Uses full sentences",status:"met"},
+      {text:"Tells a simple story with a beginning and end",status:"met"},
+      {text:"Answers 'why' questions",status:"met"},
+      {text:"Speaks clearly enough for most adults to understand",status:"met"}]},
+    {name:"Cognitive / Early Learning",icon:"🧠",color:"#f5f3ff",items:[
+      {text:"Counts and begins basic number concepts",status:"met"},
+      {text:"Recognizes some letters, shapes, and colors",status:"emerging"},
+      {text:"Copies simple shapes and may begin writing letters or name",status:"not-yet"}]},
+    {name:"Physical & Motor",icon:"💪",color:"#f0fdf4",items:[
+      {text:"Walks upstairs while holding an object",status:"met"},
+      {text:"Walks backward heel-to-toe",status:"met"},
+      {text:"Jumps forward repeatedly without falling",status:"met"},
+      {text:"Skips after demonstration",status:"not-yet"},
+      {text:"Hangs from a bar for at least 5 seconds",status:"concerned"},
+      {text:"Throws a ball with same-side stepping",status:"met"},
+      {text:"Catches a small ball with hands only",status:"emerging"}]}]},
+  6:{label:"Age 6",risk:{level:"yellow",text:"Future Milestone",sub:"Milestones become relevant as Lucas approaches Age 6."},domains:[
+    {name:"Social & Emotional",icon:"❤️",color:"#fef2f2",items:[
+      {text:"Maintains friendships and plays cooperatively",status:"not-yet"},
+      {text:"Handles more structured group settings",status:"not-yet"},
+      {text:"Shows improving emotional control",status:"not-yet"}]},
+    {name:"Language & Communication",icon:"💬",color:"#eff6ff",items:[
+      {text:"Uses complete, understandable sentences",status:"not-yet"},
+      {text:"Can explain ideas and retell events in sequence",status:"not-yet"},
+      {text:"Understands and follows multi-step directions",status:"not-yet"}]},
+    {name:"Cognitive / Learning",icon:"🧠",color:"#f5f3ff",items:[
+      {text:"Recognizes letters and many sounds",status:"not-yet"},
+      {text:"Begins reading simple words",status:"not-yet"},
+      {text:"Can focus on a task for longer periods",status:"not-yet"},
+      {text:"Understands patterns, left/right, and basic time ideas",status:"not-yet"}]},
+    {name:"Physical & Motor",icon:"💪",color:"#f0fdf4",items:[
+      {text:"Runs lightly on toes",status:"not-yet"},
+      {text:"Walks on a balance beam",status:"not-yet"},
+      {text:"Skips using a skipping rope",status:"not-yet"},
+      {text:"Hops for about 2 metres",status:"not-yet"},
+      {text:"Shows mature throwing and catching patterns",status:"not-yet"},
+      {text:"Has more refined jumping skills",status:"not-yet"}]}]},
+  7:{label:"Age 7",risk:{level:"yellow",text:"Future Milestone",sub:"School-age milestones — relevant at Age 7."},domains:[
+    {name:"Social & Emotional",icon:"❤️",color:"#fef2f2",items:[
+      {text:"Maintains friendships",status:"not-yet"},
+      {text:"Understands rules, teamwork, and fairness better",status:"not-yet"},
+      {text:"Manages frustration more independently",status:"not-yet"},
+      {text:"Can separate feelings from behavior with adult support",status:"not-yet"}]},
+    {name:"Language & Communication",icon:"💬",color:"#eff6ff",items:[
+      {text:"Tells organized stories and gives explanations",status:"not-yet"},
+      {text:"Understands classroom instructions and group discussions",status:"not-yet"},
+      {text:"Uses language for problem-solving and social negotiation",status:"not-yet"}]},
+    {name:"Cognitive / Learning",icon:"🧠",color:"#f5f3ff",items:[
+      {text:"Reads simple text more fluently",status:"not-yet"},
+      {text:"Writes short sentences",status:"not-yet"},
+      {text:"Spells some common words",status:"not-yet"},
+      {text:"Solves age-appropriate math and reasoning tasks",status:"not-yet"},
+      {text:"Can complete multi-step school tasks with less prompting",status:"not-yet"}]},
+    {name:"Physical & Motor",icon:"💪",color:"#f0fdf4",items:[
+      {text:"Has steady coordination for sports, handwriting, and self-care",status:"not-yet"},
+      {text:"Can copy more complex shapes and write more legibly",status:"not-yet"},
+      {text:"Handles buttons, zippers, utensils, and dressing independently",status:"not-yet"}]}]}
+};
+
+// ═══════════════════════════════════════
+//  PRACTICE PLAN DATA  (per milestone text)
+// ═══════════════════════════════════════
+const practiceDB = {
+  // ── Cognitive / Early Learning ──
+  "Copies simple shapes and may begin writing letters or name":{
+    icon:"✏️",color:"#f5f3ff",
+    activities:[
+      {title:"Trace & Copy",desc:"Print dotted outlines of letters (A, B, C) and the child's name. Trace over them with a crayon, then copy below.",freq:"10 min daily"},
+      {title:"Sand Writing",desc:"Pour a thin layer of sand or salt in a tray. Practise writing letters by drawing in the sand with a finger.",freq:"5–10 min, 3× per week"},
+      {title:"Shape Walk",desc:"On a walk, spot circles, squares, and triangles in the environment (wheels, windows, signs). Name and draw them when you get home.",freq:"Weekly outing"},
+      {title:"Play-Dough Letters",desc:"Roll play-dough into sausage shapes and form letter shapes together. Tactile feedback strengthens letter memory.",freq:"15 min, 2× per week"}],
+    duration:28,domain:"Cognitive"},
+  "Recognizes some letters, shapes, and colors":{
+    icon:"🔤",color:"#f5f3ff",
+    activities:[
+      {title:"Letter of the Day",desc:"Each morning, pick one letter. Find it on cereal boxes, street signs, books. Say its sound together.",freq:"Daily, 5 min"},
+      {title:"Alphabet Puzzle",desc:"Use a foam or wooden alphabet puzzle. Name each letter and say a word that starts with it as you fit the piece.",freq:"10 min, 4× per week"},
+      {title:"Color Hunt",desc:"Name a color and go around the home finding 5 objects that match. Progress to shape hunts.",freq:"5 min daily"},
+      {title:"Sing & Point",desc:"Sing the alphabet song while pointing to printed letters on a poster or fridge magnets.",freq:"Daily"}],
+    duration:28,domain:"Cognitive"},
+  // ── Motor ──
+  "Skips after demonstration":{
+    icon:"🏃",color:"#f0fdf4",
+    activities:[
+      {title:"Step-Hop Drill",desc:"Walk together, exaggerating a step-hop pattern: step with the left foot, hop on it, then right foot, hop on it. Go slowly at first.",freq:"5 min daily"},
+      {title:"Music March",desc:"Play upbeat music. March to the beat, then try to skip in time. Music naturally helps rhythm develop.",freq:"10 min, 3× per week"},
+      {title:"Follow the Leader",desc:"Skip in front of your child so they can copy you. Swap roles once they get the pattern.",freq:"10 min, alternate days"},
+      {title:"Hopscotch Variation",desc:"Draw squares and ask the child to step-hop between them. The grid gives visual targets for the pattern.",freq:"15 min, 2× per week"}],
+    duration:21,domain:"Motor"},
+  "Hangs from a bar for at least 5 seconds":{
+    icon:"💪",color:"#f0fdf4",
+    activities:[
+      {title:"Dead Hang Practice",desc:"At a playground bar (or doorway pull-up bar at adult height), support the child's waist and let them grip and hold for 2–3 seconds. Gradually reduce support.",freq:"3–5 holds, daily"},
+      {title:"Monkey Bar Traversal",desc:"Help child cross 1–2 rungs of monkey bars with your support under the hips. Focus on grip, not speed.",freq:"Playground visits, 3× per week"},
+      {title:"Play-Dough Squeeze",desc:"Squeeze and roll play-dough for 5 minutes to build hand and forearm strength for gripping.",freq:"5 min daily"},
+      {title:"Towel Tug-of-War",desc:"Hold each end of a rolled towel and play gentle tug-of-war. Engages grip and shoulder stabilisation.",freq:"5 min, 3× per week"}],
+    duration:28,domain:"Motor"},
+  "Catches a small ball with hands only":{
+    icon:"⚾",color:"#f0fdf4",
+    activities:[
+      {title:"Balloon Catch",desc:"Start with a balloon — it moves slowly, giving the child time to track and catch it with both hands.",freq:"10 min daily"},
+      {title:"Beanbag Toss",desc:"Stand 1 metre apart. Toss a beanbag underhand. Beanbags don't bounce, so they are easier to catch than balls.",freq:"10 min, 4× per week"},
+      {title:"Two-Hand Clap Catch",desc:"Child holds hands together in a scoop shape. Gently toss a soft foam ball from close range.",freq:"5–10 min daily"},
+      {title:"Ball Track & Catch",desc:"Roll a ball along a table towards the child. As skill grows, lift the toss gradually until it's airborne.",freq:"10 min, 3× per week"}],
+    duration:21,domain:"Motor"},
+  // ── Social & Emotional ──
+  "Follows classroom routines with support":{
+    icon:"📋",color:"#fef2f2",
+    activities:[
+      {title:"Visual Routine Chart",desc:"Create a picture schedule for the day (wake, eat, get dressed, school, play, dinner, bed). Review it each morning together.",freq:"Daily, 2 min"},
+      {title:"Countdown Timer",desc:"Use a visual sand timer (3–5 min) for transitions. Warn the child 'when the sand runs out, we tidy up.' Reduces surprise and protest.",freq:"Every transition"},
+      {title:"Role Play School",desc:"At home, play 'classroom.' Take turns being teacher. Practise lining up, sitting quietly, and raising a hand before speaking.",freq:"15 min, 3× per week"},
+      {title:"Praise First, Then Correct",desc:"When a routine goes smoothly, name what the child did: 'You packed your bag without being asked — great!' Specific praise reinforces the behaviour.",freq:"Ongoing"}],
+    duration:14,domain:"Social"},
+  // ── Generic fallbacks by domain ──
+  "__motor__":{
+    icon:"💪",color:"#f0fdf4",
+    activities:[
+      {title:"Active Play",desc:"Ensure 60 minutes of active outdoor play daily — running, climbing, jumping, and throwing build the foundational movements for most motor milestones.",freq:"Daily"},
+      {title:"Obstacle Course",desc:"Set up a simple home course: crawl under a table, hop between cushions, balance on a line of tape. Rotate challenges weekly.",freq:"15 min, 3× per week"},
+      {title:"Playground Visit",desc:"Targeted practice on slides, ladders, and bars builds upper and lower body strength alongside coordination.",freq:"3× per week"},
+      {title:"Dance & Movement",desc:"Follow a kids' movement video (GoNoodle or similar). Structured movement to music builds rhythm and coordination.",freq:"10 min daily"}],
+    duration:21,domain:"Motor"},
+  "__cognitive__":{
+    icon:"🧠",color:"#f5f3ff",
+    activities:[
+      {title:"Read Aloud Daily",desc:"10–15 minutes of shared reading. Ask 'what do you think happens next?' and 'why did that character do that?' to build comprehension.",freq:"Daily"},
+      {title:"Counting Games",desc:"Count objects at mealtimes, steps on stairs, or items in the shopping trolley. Embed counting in everyday moments.",freq:"Throughout the day"},
+      {title:"Puzzle Time",desc:"Age-appropriate jigsaw puzzles (12–48 pieces) build spatial reasoning, concentration, and problem-solving.",freq:"20 min, 4× per week"},
+      {title:"Memory Card Game",desc:"A simple pairs/memory game builds working memory and attention — skills underlying many cognitive milestones.",freq:"10 min, 3× per week"}],
+    duration:28,domain:"Cognitive"},
+  "__social__":{
+    icon:"❤️",color:"#fef2f2",
+    activities:[
+      {title:"Playdate Practice",desc:"Arrange structured playdates with 1 familiar peer. Keep them short (45–60 min) and provide a clear activity to anchor the play.",freq:"Weekly"},
+      {title:"Emotion Check-In",desc:"At bedtime, ask 'name one thing that made you happy today and one thing that felt hard.' Builds emotional vocabulary.",freq:"Daily"},
+      {title:"Board Games",desc:"Simple board games (Snakes & Ladders, Uno Junior) practise turn-taking, rule-following, and managing winning/losing.",freq:"20 min, 3× per week"},
+      {title:"Story Feelings",desc:"While reading, pause to ask 'how do you think this character feels right now?' Builds empathy and emotional recognition.",freq:"Each read-aloud"}],
+    duration:14,domain:"Social"},
+  "__language__":{
+    icon:"💬",color:"#eff6ff",
+    activities:[
+      {title:"Narrate Your Day",desc:"Describe what you are doing in simple sentences as you cook, drive, or tidy. The child absorbs vocabulary and sentence structure from natural speech.",freq:"Daily"},
+      {title:"Ask Open Questions",desc:"Replace yes/no questions with open ones: 'What happened at school today?' and 'Why do you think she was sad?'",freq:"Daily"},
+      {title:"Story Retell",desc:"After reading a book or watching a show, ask the child to tell you what happened from the beginning, middle, and end.",freq:"After each story"},
+      {title:"Rhyme Games",desc:"Clap a rhythm and take turns saying rhyming words. Start with easy pairs (cat/hat) and progress to harder ones.",freq:"5–10 min, daily"}],
+    duration:21,domain:"Language"}
+};
+
+// Pre-simulate some active plans (key = milestone text, value = {startDay, duration})
+// For demo: "Skips" started 8 days ago (21-day plan) → 13 days left
+//            "Recognizes some letters..." started 3 days ago (28-day plan) → 25 days left
+//            "Hangs from a bar..." started 30 days ago (28-day plan) → OVERDUE
+const TODAY = 0; // relative days from now
+const activePlans = {
+  "Skips after demonstration":                        {started:-8,  duration:21},
+  "Recognizes some letters, shapes, and colors":      {started:-3,  duration:28},
+  "Hangs from a bar for at least 5 seconds":          {started:-30, duration:28},
+};
+
+function getDaysLeft(key) {
+  const p = activePlans[key];
+  if (!p) return null;
+  return p.duration + p.started; // days remaining (negative = overdue)
+}
+
+let currentAge = 5;
+const statusCycle = {"not-yet":"emerging","emerging":"met","met":"concerned","concerned":"not-yet"};
+const statusLabel  = {"met":"Met ✓","emerging":"Emerging","not-yet":"Not Yet","concerned":"Concerned — seek review"};
+const checkMark    = {"met":"✓","emerging":"~","concerned":"!","not-yet":""};
+
+function setAge(age) {
+  currentAge = age;
+  document.querySelectorAll('.age-pill').forEach(p =>
+    p.classList.toggle('active', p.textContent === 'Age ' + age));
+  renderMilestones();
+}
+
+function renderMilestones() {
+  const d = milestoneData[currentAge];
+  const icons = {green:'✅',yellow:'⚠️',orange:'🔶',red:'🚨'};
+  let html = `<div class="risk-banner ${d.risk.level}">
+    <div class="rb-icon">${icons[d.risk.level]}</div>
+    <div><div class="rb-title">${d.risk.text}</div><div class="rb-sub">${d.risk.sub}</div></div>
+  </div>`;
+
+  d.domains.forEach((dom, di) => {
+    html += `<div class="domain-block">
+      <div class="domain-header">
+        <div class="domain-badge" style="background:${dom.color}">${dom.icon}</div>${dom.name}
+      </div>`;
+    dom.items.forEach((item, ii) => {
+      const needsPractice = item.status === 'not-yet' || item.status === 'concerned' || item.status === 'emerging';
+      const daysLeft = getDaysLeft(item.text);
+      const hasPlan  = daysLeft !== null;
+      const isOverdue = hasPlan && daysLeft <= 0;
+      const isActive  = hasPlan && daysLeft > 0;
+
+      // Strip label & button
+      let stripTag = '', stripPlan = '', btnHtml = '';
+      if (needsPractice) {
+        if (isOverdue) {
+          stripTag  = `<span class="ps-tag" style="color:#dc2626">⏰ Plan ended — not yet resolved</span>`;
+          stripPlan = `<span class="ps-plan overdue">Practice completed · Still not met</span>`;
+          btnHtml   = `<button class="practice-btn consult" onclick="openPractice(${currentAge},${di},${ii},true,event)">Consult Help</button>`;
+        } else if (isActive) {
+          const pct = Math.round(((activePlans[item.text].duration + activePlans[item.text].started) / activePlans[item.text].duration) * 100);
+          stripTag  = `<span class="ps-tag" style="color:#7C3AED">🏋️ Practice plan active</span>`;
+          stripPlan = `<span class="ps-plan">${daysLeft} day${daysLeft!==1?'s':''} remaining</span>`;
+          btnHtml   = `<button class="practice-btn active" onclick="openPractice(${currentAge},${di},${ii},false,event)">View Plan</button>`;
+        } else {
+          // no plan yet
+          if (item.status === 'emerging') {
+            stripTag = `<span class="ps-tag">💡 Emerging — try some activities</span>`;
+          } else if (item.status === 'concerned') {
+            stripTag = `<span class="ps-tag">🚨 Concerned — start a plan</span>`;
+          } else {
+            stripTag = `<span class="ps-tag">💡 Not yet — try a practice plan</span>`;
+          }
+          stripPlan = `<span class="ps-plan">Set a practice goal</span>`;
+          btnHtml   = `<button class="practice-btn start" onclick="openPractice(${currentAge},${di},${ii},false,event)">Practice</button>`;
+        }
+      }
+
+      html += `<div class="m-item ${item.status}">
+        <div class="m-item-row" onclick="cycleStatus(${currentAge},${di},${ii})">
+          <div class="m-check">${checkMark[item.status]}</div>
+          <div style="flex:1">
+            <div class="m-title">${item.text}</div>
+            <div class="m-status">${statusLabel[item.status]}</div>
+          </div>
+        </div>
+        ${needsPractice ? `<div class="practice-strip">
+          <div class="ps-left">${stripTag}${stripPlan}</div>
+          ${btnHtml}
+        </div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('m-body').innerHTML = html;
+}
+
+function cycleStatus(age, di, ii) {
+  const item = milestoneData[age].domains[di].items[ii];
+  item.status = statusCycle[item.status];
+  renderMilestones();
+  showToast('Status: ' + statusLabel[item.status]);
+}
+
+renderMilestones();
+
+// ═══════════════════════════════════════
+//  PRACTICE MODAL
+// ═══════════════════════════════════════
+let selectedDuration = 28;
+
+function getPracticeData(milestone, domainName) {
+  if (practiceDB[milestone]) return practiceDB[milestone];
+  const dl = domainName.toLowerCase();
+  if (dl.includes('motor') || dl.includes('physical')) return practiceDB['__motor__'];
+  if (dl.includes('cognitive') || dl.includes('learning')) return practiceDB['__cognitive__'];
+  if (dl.includes('social') || dl.includes('emotional')) return practiceDB['__social__'];
+  return practiceDB['__language__'];
+}
+
+function openPractice(age, di, ii, isConsult, event) {
+  event.stopPropagation();
+  const item   = milestoneData[age].domains[di].items[ii];
+  const domain = milestoneData[age].domains[di];
+  const pd     = getPracticeData(item.text, domain.name);
+  const daysLeft = getDaysLeft(item.text);
+  const hasPlan  = daysLeft !== null;
+  const isOverdue = hasPlan && daysLeft <= 0;
+  const plan = activePlans[item.text];
+
+  const statusColors = {
+    "not-yet":"#6b7280","emerging":"#ca8a04","concerned":"#dc2626"
+  };
+  const statusTexts = {
+    "not-yet":"Not Yet Achieved","emerging":"Emerging — nearly there","concerned":"Concerned — needs attention"
+  };
+
+  // Duration options
+  const durs = [14,21,28,42];
+  selectedDuration = plan ? plan.duration : 28;
+  const durHtml = durs.map(d =>
+    `<button class="dur-btn ${selectedDuration===d?'active':''}" onclick="selectDur(${d})">${d} days</button>`
+  ).join('');
+
+  // Progress countdown
+  let countdownHtml = '';
+  if (hasPlan && !isOverdue) {
+    const elapsed = plan.duration + plan.started;
+    const pct = Math.round((elapsed / plan.duration) * 100);
+    countdownHtml = `<div class="plan-countdown show">
+      <div class="pc-top">
+        <div><div class="pc-days">${daysLeft}</div><div class="pc-unit">days left</div></div>
+        <span style="font-size:11px;opacity:.8">Day ${Math.abs(plan.started)} of ${plan.duration}</span>
+      </div>
+      <div class="pc-label">Practice plan in progress — keep going!</div>
+      <div class="pc-prog-bg"><div class="pc-prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }
+
+  // Overdue warning
+  let overdueHtml = '';
+  if (isOverdue || isConsult) {
+    const overDays = Math.abs(daysLeft || 0);
+    overdueHtml = `<div class="plan-overdue show">
+      <div class="po-title">⏰ Practice Period Ended${overDays>0?' ('+overDays+' days ago)':''}</div>
+      <div class="po-sub">Lucas has been practising for ${plan?plan.duration:28} days and this milestone is still not fully met. This is a good time to discuss with a professional — early support makes a big difference.</div>
+      <button class="consult-btn" onclick="showToast('Opening Specialist Finder…');document.getElementById(\'practice-modal\').classList.remove(\'open\');switchTab(\'progress\')">Find a Specialist →</button>
+    </div>`;
+  }
+
+  // Activities
+  const actHtml = pd.activities.map((a,i) => `
+    <div class="activity-item">
+      <div class="a-num">${i+1}</div>
+      <div class="a-text">
+        <div class="a-title">${a.title}</div>
+        <div class="a-desc">${a.desc}</div>
+        <div class="a-freq">📅 ${a.freq}</div>
+      </div>
+    </div>`).join('');
+
+  const startBtnHtml = (isOverdue || isConsult) ? '' : hasPlan
+    ? `<button class="start-plan-btn" onclick="showToast('✅ Plan updated!');document.getElementById('practice-modal').classList.remove('open')">Update Plan</button>`
+    : `<button class="start-plan-btn" onclick="startPlan('${item.text.replace(/'/g,"\\'")}',${ii},${di},${age})">Start Practice Plan</button>`;
+
+  document.getElementById('practice-sheet').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="pm-header">
+      <div class="pm-icon" style="background:${pd.color}">${pd.icon}</div>
+      <div>
+        <div class="pm-title">${item.text}</div>
+        <div class="pm-age">${milestoneData[age].label} · ${domain.name}</div>
+      </div>
+    </div>
+
+    <div class="pm-status-ribbon ${item.status}">
+      <div style="font-size:22px">${item.status==='concerned'?'🚨':item.status==='emerging'?'⚠️':'❌'}</div>
+      <div class="psr-text">
+        <div class="psr-label">${statusTexts[item.status] || statusTexts['not-yet']}</div>
+        <div class="psr-sub">Tap the circle on the milestone to update when achieved</div>
+      </div>
+    </div>
+
+    ${countdownHtml}
+    ${overdueHtml}
+
+    <div class="activities-label">🏋️ Recommended Practice Activities</div>
+    ${actHtml}
+
+    ${!hasPlan && !isConsult ? `
+    <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;margin:12px 0 8px">Set Practice Duration</div>
+    <div class="duration-row">${durHtml}</div>` : ''}
+
+    ${startBtnHtml}
+    <span class="modal-cancel" onclick="document.getElementById('practice-modal').classList.remove('open')">Close</span>
+  `;
+
+  document.getElementById('practice-modal').classList.add('open');
+}
+
+function selectDur(d) {
+  selectedDuration = d;
+  document.querySelectorAll('.dur-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.textContent) === d);
+  });
+}
+
+function startPlan(milestoneText, ii, di, age) {
+  activePlans[milestoneText] = { started: 0, duration: selectedDuration };
+  document.getElementById('practice-modal').classList.remove('open');
+  showToast('✅ ' + selectedDuration + '-day practice plan started!');
+  renderMilestones();
+}
+
+function closePracticeOutside(e) {
+  if (e.target === document.getElementById('practice-modal'))
+    document.getElementById('practice-modal').classList.remove('open');
+}
+
+// ═══════════════════════════════════════
+//  RED FLAGS
+// ═══════════════════════════════════════
+let flagCount = 3;
+function toggleFlag(el) {
+  el.classList.toggle('flagged');
+  el.querySelector('.rf-checkbox').textContent = el.classList.contains('flagged') ? '✓' : '';
+  flagCount = document.querySelectorAll('.rf-item.flagged').length;
+  updateRfResult();
+}
+function updateRfResult() {
+  const bar = document.getElementById('rf-result');
+  const title = document.getElementById('rf-result-title');
+  const sub   = document.getElementById('rf-result-sub');
+  if (flagCount === 0) { bar.classList.remove('show'); return; }
+  bar.classList.add('show');
+  if (flagCount >= 4) {
+    bar.style.borderColor = '#dc2626';
+    title.textContent = '🚨 ' + flagCount + ' Concerns — Specialist Review Recommended';
+    sub.textContent = 'Multiple domains flagged. Consider prompt specialist referral.';
+  } else if (flagCount >= 2) {
+    bar.style.borderColor = '#ea580c';
+    title.textContent = '⚠️ ' + flagCount + ' Concerns — Developmental Screening Suggested';
+    sub.textContent = 'Repeated concerns may benefit from developmental screening.';
+  } else {
+    bar.style.borderColor = '#ca8a04';
+    title.textContent = '⚠️ 1 Concern — Monitor & Recheck';
+    sub.textContent = 'One isolated concern. Monitor and reassess in 4–6 weeks.';
+  }
+}
+updateRfResult();
+
+function openRefModal()  { document.getElementById('ref-modal').classList.add('open'); }
+function closeRefModal() { document.getElementById('ref-modal').classList.remove('open'); }
+function closeRefOutside(e) { if (e.target === document.getElementById('ref-modal')) closeRefModal(); }
+
+// ═══════════════════════════════════════
+//  NAV & TOAST
+// ═══════════════════════════════════════
+function switchTab(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

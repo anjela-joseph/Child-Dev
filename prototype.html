@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STARLET – Child Development Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f4ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #fff;
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.22), 0 0 0 10px #1a1a2e, 0 0 0 12px #333;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* notch */
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 30px; background: #1a1a2e;
+    border-radius: 0 0 20px 20px; z-index: 100;
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    height: 44px; background: #fff; display: flex;
+    align-items: flex-end; justify-content: space-between;
+    padding: 0 24px 6px; font-size: 12px; font-weight: 600; color: #111;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .bat { width: 22px; height: 11px; border: 1.5px solid #111; border-radius: 3px; position: relative; }
+  .bat::after { content:''; position:absolute; top:2px; left:2px; right:4px; bottom:2px; background:#111; border-radius:1px; }
+  .bat::before { content:''; position:absolute; right:-4px; top:3px; width:3px; height:5px; background:#111; border-radius:0 2px 2px 0; }
+
+  /* ── Screens wrapper ── */
+  .screens { flex: 1; overflow: hidden; position: relative; }
+  .screen { position: absolute; inset: 0; overflow-y: auto; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ── Bottom nav ── */
+  .bottom-nav {
+    height: 72px; background: #fff; border-top: 1px solid #eee;
+    display: flex; align-items: center; justify-content: space-around;
+    flex-shrink: 0; padding-bottom: 8px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; padding: 6px 12px; border-radius: 14px;
+    transition: background .15s;
+  }
+  .nav-item:hover { background: #f5f7ff; }
+  .nav-item svg { width: 24px; height: 24px; }
+  .nav-item span { font-size: 10px; font-weight: 600; color: #999; }
+  .nav-item.active span { color: #5B5FEF; }
+  .nav-item.active svg path, .nav-item.active svg rect, .nav-item.active svg circle { fill: #5B5FEF; }
+
+  /* ── Common header ── */
+  .page-header {
+    padding: 16px 20px 12px;
+    background: linear-gradient(135deg, #5B5FEF 0%, #8B5CF6 100%);
+    color: #fff; flex-shrink: 0;
+  }
+  .page-header h1 { font-size: 22px; font-weight: 700; }
+  .page-header p { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff; border-radius: 16px; padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700; color: #888;
+    text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;
+  }
+  .section-pad { padding: 16px; }
+
+  /* ── Pills / chips ── */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+  .chip-green { background: #e6faf0; color: #16a34a; }
+  .chip-yellow { background: #fefce8; color: #ca8a04; }
+  .chip-orange { background: #fff7ed; color: #ea580c; }
+  .chip-red { background: #fef2f2; color: #dc2626; }
+  .chip-blue { background: #eff6ff; color: #2563eb; }
+  .chip-purple { background: #f5f3ff; color: #7c3aed; }
+
+  /* ════════════════════════════════════
+     HOME SCREEN
+  ════════════════════════════════════ */
+  #home .hero {
+    background: linear-gradient(135deg, #5B5FEF 0%, #8B5CF6 100%);
+    padding: 20px 20px 28px; color: #fff;
+  }
+  #home .hero-greeting { font-size: 14px; opacity: .85; }
+  #home .hero-name { font-size: 26px; font-weight: 800; margin: 2px 0 4px; }
+  #home .hero-sub { font-size: 13px; opacity: .8; }
+  #home .baby-card {
+    background: rgba(255,255,255,.18); border-radius: 20px;
+    padding: 14px; margin-top: 16px; display: flex; align-items: center; gap: 14px;
+  }
+  #home .baby-avatar {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(255,255,255,.3); display: flex; align-items: center;
+    justify-content: center; font-size: 26px;
+  }
+  #home .baby-info .name { font-size: 18px; font-weight: 700; }
+  #home .baby-info .age { font-size: 13px; opacity: .85; }
+  #home .baby-info .dob { font-size: 11px; opacity: .7; margin-top: 2px; }
+
+  #home .quick-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; padding: 16px;
+  }
+  .stat-card {
+    background: #fff; border-radius: 16px; padding: 14px 10px;
+    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    cursor: pointer; transition: transform .15s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .stat-icon { font-size: 22px; margin-bottom: 4px; }
+  .stat-card .stat-val { font-size: 20px; font-weight: 800; color: #5B5FEF; }
+  .stat-card .stat-lbl { font-size: 10px; color: #888; font-weight: 600; margin-top: 2px; }
+
+  #home .today-section { padding: 0 16px 16px; }
+  #home .today-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #1a1a2e; }
+
+  .today-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; background: #fff; border-radius: 14px;
+    margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .today-item .t-icon { width: 38px; height: 38px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .today-item .t-text .t-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+  .today-item .t-text .t-sub { font-size: 12px; color: #888; margin-top: 1px; }
+  .today-item .t-badge { margin-left: auto; }
+
+  /* ════════════════════════════════════
+     MILESTONES SCREEN
+  ════════════════════════════════════ */
+  #milestones .month-selector {
+    background: #fff; padding: 14px 16px; border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+  }
+  #milestones .month-selector label { font-size: 12px; font-weight: 700; color: #888;
+    text-transform: uppercase; display: block; margin-bottom: 8px; }
+  .month-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .month-pills::-webkit-scrollbar { display: none; }
+  .month-pill {
+    flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    background: #f3f4f6; color: #666; border: none;
+    transition: all .15s;
+  }
+  .month-pill.active { background: #5B5FEF; color: #fff; }
+
+  #milestones .milestone-body { flex: 1; overflow-y: auto; padding: 14px; }
+  #milestones .milestone-body::-webkit-scrollbar { display: none; }
+
+  .domain-block { margin-bottom: 16px; }
+  .domain-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #1a1a2e;
+    margin-bottom: 8px;
+  }
+  .domain-badge { width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+  .milestone-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; background: #fff; border-radius: 12px;
+    margin-bottom: 6px; box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    cursor: pointer;
+  }
+  .milestone-item .m-check {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid #d1d5db;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0; margin-top: 1px; transition: all .2s;
+  }
+  .milestone-item.met .m-check { background: #16a34a; border-color: #16a34a; color: #fff; }
+  .milestone-item.emerging .m-check { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+  .milestone-item.not-yet .m-check { background: #fff; border-color: #d1d5db; }
+  .milestone-item.concerned .m-check { background: #dc2626; border-color: #dc2626; color: #fff; }
+
+  .milestone-item .m-text { flex: 1; }
+  .milestone-item .m-title { font-size: 13px; font-weight: 600; color: #1a1a2e; line-height: 1.4; }
+  .milestone-item .m-status { font-size: 11px; margin-top: 3px; font-weight: 600; }
+  .milestone-item.met .m-status { color: #16a34a; }
+  .milestone-item.emerging .m-status { color: #f59e0b; }
+  .milestone-item.not-yet .m-status { color: #9ca3af; }
+  .milestone-item.concerned .m-status { color: #dc2626; }
+
+  .risk-banner {
+    border-radius: 14px; padding: 12px 14px;
+    display: flex; gap: 10px; align-items: center; margin-bottom: 14px;
+  }
+  .risk-banner.green { background: #e6faf0; }
+  .risk-banner.yellow { background: #fefce8; }
+  .risk-banner.orange { background: #fff7ed; }
+  .risk-banner.red { background: #fef2f2; }
+  .risk-banner .rb-icon { font-size: 22px; }
+  .risk-banner .rb-text .rb-title { font-size: 13px; font-weight: 700; }
+  .risk-banner .rb-text .rb-sub { font-size: 11px; opacity: .8; margin-top: 2px; }
+  .risk-banner.green .rb-title { color: #16a34a; }
+  .risk-banner.yellow .rb-title { color: #ca8a04; }
+  .risk-banner.orange .rb-title { color: #ea580c; }
+  .risk-banner.red .rb-title { color: #dc2626; }
+
+  /* ════════════════════════════════════
+     ALLERGY TRACKER SCREEN
+  ════════════════════════════════════ */
+  #allergy .allergy-body { flex: 1; overflow-y: auto; padding: 14px; }
+  #allergy .allergy-body::-webkit-scrollbar { display: none; }
+
+  .add-food-btn {
+    width: 100%; padding: 14px; background: linear-gradient(135deg, #5B5FEF, #8B5CF6);
+    color: #fff; border: none; border-radius: 14px; font-size: 14px;
+    font-weight: 700; cursor: pointer; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .track-card {
+    background: #fff; border-radius: 16px; padding: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07); margin-bottom: 10px;
+    border-left: 4px solid #5B5FEF;
+  }
+  .track-card.warning { border-left-color: #f59e0b; }
+  .track-card.completed { border-left-color: #16a34a; }
+
+  .track-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .track-food { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .track-intro { font-size: 11px; color: #888; margin-top: 2px; }
+
+  .track-progress { margin-top: 8px; }
+  .progress-bar-bg {
+    height: 8px; background: #f0f0f0; border-radius: 99px; margin-bottom: 6px;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 99px;
+    transition: width .5s ease;
+    background: linear-gradient(90deg, #5B5FEF, #8B5CF6);
+  }
+  .progress-bar-fill.done { background: linear-gradient(90deg, #16a34a, #22c55e); }
+  .progress-bar-fill.warn { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+  .track-timer { display: flex; justify-content: space-between; align-items: center; }
+  .track-timer .countdown { font-size: 13px; font-weight: 700; color: #5B5FEF; }
+  .track-timer .countdown.done { color: #16a34a; }
+  .track-timer .countdown.warn { color: #f59e0b; }
+  .track-days-left { font-size: 11px; color: #888; }
+
+  .symptom-log { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; }
+  .symptom-log-title { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+  .symptom-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .symptom-btn {
+    padding: 5px 10px; border-radius: 8px; border: 1.5px solid #e5e7eb;
+    font-size: 11px; font-weight: 600; color: #555; background: #fafafa;
+    cursor: pointer; transition: all .15s;
+  }
+  .symptom-btn.selected { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
+  .symptom-btn.none-selected { background: #e6faf0; border-color: #16a34a; color: #16a34a; }
+
+  /* log history */
+  .log-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid #f3f4f6;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; margin-top: 5px; flex-shrink: 0; }
+  .log-dot.warn { background: #f59e0b; }
+  .log-text .log-title { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .log-text .log-sub { font-size: 11px; color: #888; margin-top: 2px; }
+
+  /* modal */
+  .modal-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,.4);
+    display: none; align-items: flex-end; z-index: 200;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    width: 100%; background: #fff; border-radius: 24px 24px 0 0;
+    padding: 20px; max-height: 70%;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 36px; height: 4px; background: #e5e7eb; border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #1a1a2e; }
+  .modal-input {
+    width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb; border-radius: 12px;
+    font-size: 14px; outline: none; margin-bottom: 10px; font-family: inherit;
+  }
+  .modal-input:focus { border-color: #5B5FEF; }
+  .modal-btn {
+    width: 100%; padding: 14px; background: linear-gradient(135deg, #5B5FEF, #8B5CF6);
+    color: #fff; border: none; border-radius: 12px; font-size: 15px;
+    font-weight: 700; cursor: pointer; margin-top: 6px;
+  }
+  .modal-cancel { display: block; text-align: center; margin-top: 10px;
+    font-size: 13px; color: #888; cursor: pointer; }
+
+  /* ════════════════════════════════════
+     VACCINES SCREEN
+  ════════════════════════════════════ */
+  #vaccines .vaccine-body { flex: 1; overflow-y: auto; padding: 14px; }
+  #vaccines .vaccine-body::-webkit-scrollbar { display: none; }
+
+  .visit-card {
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 12px; overflow: hidden;
+  }
+  .visit-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px; cursor: pointer; user-select: none;
+  }
+  .visit-header:hover { background: #fafafa; }
+  .visit-age { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .visit-date { font-size: 12px; color: #888; margin-top: 2px; }
+  .visit-arrow { font-size: 18px; color: #aaa; transition: transform .2s; }
+  .visit-card.open .visit-arrow { transform: rotate(180deg); }
+  .visit-body { display: none; border-top: 1px solid #f3f4f6; padding: 12px; }
+  .visit-card.open .visit-body { display: block; }
+
+  .vax-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 10px; margin-bottom: 6px;
+    cursor: pointer; transition: background .15s;
+  }
+  .vax-item:hover { background: #f9fafb; }
+  .vax-check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid #d1d5db;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0; transition: all .2s;
+  }
+  .vax-item.done .vax-check { background: #5B5FEF; border-color: #5B5FEF; color: #fff; }
+  .vax-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .vax-full { font-size: 11px; color: #888; }
+  .vax-date-done { margin-left: auto; font-size: 11px; color: #16a34a; font-weight: 600; }
+
+  .visit-complete-badge {
+    display: flex; align-items: center; gap: 6px; margin-top: 10px;
+    padding: 8px 12px; background: #e6faf0; border-radius: 10px;
+    font-size: 12px; font-weight: 600; color: #16a34a;
+  }
+
+  .health-docs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+  }
+  .doc-card {
+    background: #fff; border-radius: 14px; padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06); text-align: center; cursor: pointer;
+    transition: transform .15s;
+  }
+  .doc-card:hover { transform: translateY(-2px); }
+  .doc-card .doc-icon { font-size: 28px; margin-bottom: 6px; }
+  .doc-card .doc-name { font-size: 12px; font-weight: 700; color: #1a1a2e; }
+  .doc-card .doc-sub { font-size: 10px; color: #888; margin-top: 2px; }
+
+  /* ── toast ── */
+  .toast {
+    position: absolute; bottom: 88px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e; color: #fff; padding: 10px 20px; border-radius: 12px;
+    font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: all .3s; white-space: nowrap; z-index: 300;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .section-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+
+  /* scrollable milestone body */
+  .milestone-scroll { overflow-y: auto; flex: 1; }
+  .milestone-scroll::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <span style="font-size:12px">●●●</span>
+      <div class="bat"></div>
+    </div>
+  </div>
+
+  <!-- Screens -->
+  <div class="screens">
+
+    <!-- ══════════════ HOME ══════════════ -->
+    <div class="screen active" id="home">
+      <div class="hero">
+        <div class="hero-greeting">Good morning, Anjela 👋</div>
+        <div class="hero-name">Starlet App</div>
+        <div class="hero-sub">Child Development Tracker · 0–2 Years</div>
+        <div class="baby-card">
+          <div class="baby-avatar">👶</div>
+          <div class="baby-info">
+            <div class="name">Baby Sophia</div>
+            <div class="age">7 months old</div>
+            <div class="dob">Born December 5, 2025</div>
+          </div>
+          <div style="margin-left:auto">
+            <span class="chip chip-green">On Track</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-stats">
+        <div class="stat-card" onclick="switchTab('milestones')">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-val">14</div>
+          <div class="stat-lbl">Milestones Met</div>
+        </div>
+        <div class="stat-card" onclick="switchTab('allergy')">
+          <div class="stat-icon">🍽️</div>
+          <div class="stat-val">3</div>
+          <div class="stat-lbl">Active Tracks</div>
+        </div>
+        <div class="stat-card" onclick="switchTab('vaccines')">
+          <div class="stat-icon">💉</div>
+          <div class="stat-val">8</div>
+          <div class="stat-lbl">Vaccines Done</div>
+        </div>
+      </div>
+
+      <div class="today-section">
+        <h3>Today's Actions</h3>
+
+        <div class="today-item">
+          <div class="t-icon" style="background:#fef2f2">🚨</div>
+          <div class="t-text">
+            <div class="t-title">Allergy Check-in Due</div>
+            <div class="t-sub">Day 2 of 3 · Butternut Squash</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-orange">Day 2</span></div>
+        </div>
+
+        <div class="today-item">
+          <div class="t-icon" style="background:#eff6ff">💉</div>
+          <div class="t-text">
+            <div class="t-title">6-Month Vaccines Due Soon</div>
+            <div class="t-sub">DTaP · IPV · PCV · HepB · Flu</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-blue">Upcoming</span></div>
+        </div>
+
+        <div class="today-item">
+          <div class="t-icon" style="background:#f5f3ff">🎯</div>
+          <div class="t-text">
+            <div class="t-title">Log Milestone Progress</div>
+            <div class="t-sub">7-month check — 2 items pending</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-purple">2 left</span></div>
+        </div>
+
+        <div class="today-item">
+          <div class="t-icon" style="background:#e6faf0">✅</div>
+          <div class="t-text">
+            <div class="t-title">Sweet Potato — Track Complete</div>
+            <div class="t-sub">No reactions observed · Safe to repeat</div>
+          </div>
+          <div class="t-badge"><span class="chip chip-green">Clear</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ MILESTONES ══════════════ -->
+    <div class="screen" id="milestones">
+      <div class="page-header">
+        <h1>Milestones</h1>
+        <p>Filtered by age in months · 0–24 months</p>
+      </div>
+
+      <div class="month-selector">
+        <label>Filter by Age</label>
+        <div class="month-pills">
+          <button class="month-pill" onclick="setMonth(2)">2m</button>
+          <button class="month-pill" onclick="setMonth(4)">4m</button>
+          <button class="month-pill" onclick="setMonth(6)">6m</button>
+          <button class="month-pill active" onclick="setMonth(7)">7m</button>
+          <button class="month-pill" onclick="setMonth(9)">9m</button>
+          <button class="month-pill" onclick="setMonth(12)">12m</button>
+          <button class="month-pill" onclick="setMonth(15)">15m</button>
+          <button class="month-pill" onclick="setMonth(18)">18m</button>
+          <button class="month-pill" onclick="setMonth(24)">24m</button>
+        </div>
+      </div>
+
+      <div class="milestone-body" id="milestone-body"></div>
+    </div>
+
+    <!-- ══════════════ ALLERGY TRACKER ══════════════ -->
+    <div class="screen" id="allergy">
+      <div class="page-header">
+        <h1>Allergy Buffer Engine</h1>
+        <p>3-Day isolation window per food introduction</p>
+      </div>
+
+      <div class="allergy-body">
+        <button class="add-food-btn" onclick="openModal()">
+          ＋ Log New Food Introduction
+        </button>
+
+        <!-- Active Tracks -->
+        <div class="section-title">🔴 Active Tracking Windows</div>
+
+        <!-- Track 1 - active day 2 -->
+        <div class="track-card warning">
+          <div class="track-header">
+            <div>
+              <div class="track-food">🥦 Butternut Squash</div>
+              <div class="track-intro">Introduced: July 11, 2025 · 10:00 AM</div>
+            </div>
+            <span class="chip chip-orange">Day 2 of 3</span>
+          </div>
+          <div class="track-progress">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill warn" style="width:66%"></div>
+            </div>
+            <div class="track-timer">
+              <span class="countdown warn" id="timer1">23:14:08 remaining</span>
+              <span class="track-days-left">Ends July 14</span>
+            </div>
+          </div>
+          <div class="symptom-log">
+            <div class="symptom-log-title">Daily Symptom Check-in</div>
+            <div class="symptom-btns">
+              <button class="symptom-btn none-selected">✓ No Symptoms</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Rash</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Vomiting</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Diarrhea</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Hives</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Track 2 - day 1 -->
+        <div class="track-card">
+          <div class="track-header">
+            <div>
+              <div class="track-food">🍗 Pureed Chicken</div>
+              <div class="track-intro">Introduced: July 12, 2025 · 8:30 AM</div>
+            </div>
+            <span class="chip chip-blue">Day 1 of 3</span>
+          </div>
+          <div class="track-progress">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width:33%"></div>
+            </div>
+            <div class="track-timer">
+              <span class="countdown" id="timer2">47:12:31 remaining</span>
+              <span class="track-days-left">Ends July 15</span>
+            </div>
+          </div>
+          <div class="symptom-log">
+            <div class="symptom-log-title">Daily Symptom Check-in</div>
+            <div class="symptom-btns">
+              <button class="symptom-btn none-selected">✓ No Symptoms</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Rash</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Vomiting</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Diarrhea</button>
+              <button class="symptom-btn" onclick="toggleSymptom(this)">Hives</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="section-title" style="margin-top:4px">✅ Completed Tracks</div>
+
+        <div class="track-card completed">
+          <div class="track-header">
+            <div>
+              <div class="track-food">🍠 Sweet Potato</div>
+              <div class="track-intro">Introduced: July 8, 2025</div>
+            </div>
+            <span class="chip chip-green">Clear ✓</span>
+          </div>
+          <div class="track-progress">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill done" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="symptom-log">
+            <div class="log-item">
+              <div class="log-dot"></div>
+              <div class="log-text">
+                <div class="log-title">Day 1 — No symptoms</div>
+                <div class="log-sub">July 8, 2025</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot"></div>
+              <div class="log-text">
+                <div class="log-title">Day 2 — No symptoms</div>
+                <div class="log-sub">July 9, 2025</div>
+              </div>
+            </div>
+            <div class="log-item">
+              <div class="log-dot"></div>
+              <div class="log-text">
+                <div class="log-title">Day 3 — No symptoms</div>
+                <div class="log-sub">July 10, 2025</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="track-card completed">
+          <div class="track-header">
+            <div>
+              <div class="track-food">🥕 Carrot Puree</div>
+              <div class="track-intro">Introduced: July 3, 2025</div>
+            </div>
+            <span class="chip chip-green">Clear ✓</span>
+          </div>
+          <div class="track-progress">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill done" style="width:100%"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════ VACCINES ══════════════ -->
+    <div class="screen" id="vaccines">
+      <div class="page-header">
+        <h1>Health Folder</h1>
+        <p>Infant Immunization Schedule · 0–24 months</p>
+      </div>
+
+      <div class="vaccine-body">
+
+        <!-- Health docs quick access -->
+        <div class="section-title">📁 Health Documents</div>
+        <div class="health-docs">
+          <div class="doc-card" onclick="showToast('Opening Growth Chart…')">
+            <div class="doc-icon">📈</div>
+            <div class="doc-name">Growth Chart</div>
+            <div class="doc-sub">Height · Weight · BMI</div>
+          </div>
+          <div class="doc-card" onclick="showToast('Opening Pediatrician Notes…')">
+            <div class="doc-icon">👨‍⚕️</div>
+            <div class="doc-name">Doctor Notes</div>
+            <div class="doc-sub">Last visit: Jul 1</div>
+          </div>
+          <div class="doc-card" onclick="showToast('Opening Lab Results…')">
+            <div class="doc-icon">🧪</div>
+            <div class="doc-name">Lab Results</div>
+            <div class="doc-sub">Blood type: O+</div>
+          </div>
+          <div class="doc-card" onclick="showToast('Opening Allergy History…')">
+            <div class="doc-icon">⚠️</div>
+            <div class="doc-name">Allergy History</div>
+            <div class="doc-sub">4 foods tracked</div>
+          </div>
+        </div>
+
+        <div class="section-title">💉 Immunization Schedule</div>
+
+        <!-- Birth -->
+        <div class="visit-card open" id="vc-birth">
+          <div class="visit-header" onclick="toggleVisit('birth')">
+            <div>
+              <div class="visit-age">At Birth</div>
+              <div class="visit-date">December 5, 2025</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="chip chip-green">Done</span>
+              <span class="visit-arrow">▾</span>
+            </div>
+          </div>
+          <div class="visit-body">
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div>
+                <div class="vax-name">HepB</div>
+                <div class="vax-full">Hepatitis B (1st dose)</div>
+              </div>
+              <div class="vax-date-done">Dec 5 ✓</div>
+            </div>
+            <div class="visit-complete-badge">✅ All birth vaccines complete</div>
+          </div>
+        </div>
+
+        <!-- 2 months -->
+        <div class="visit-card open" id="vc-2m">
+          <div class="visit-header" onclick="toggleVisit('2m')">
+            <div>
+              <div class="visit-age">2 Months</div>
+              <div class="visit-date">February 5, 2026</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="chip chip-green">Done</span>
+              <span class="visit-arrow">▾</span>
+            </div>
+          </div>
+          <div class="visit-body">
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">HepB</div><div class="vax-full">Hepatitis B (2nd dose)</div></div>
+              <div class="vax-date-done">Feb 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">RV</div><div class="vax-full">Rotavirus</div></div>
+              <div class="vax-date-done">Feb 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">DTaP</div><div class="vax-full">Diphtheria, Tetanus, Pertussis</div></div>
+              <div class="vax-date-done">Feb 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">Hib</div><div class="vax-full">Haemophilus influenzae type b</div></div>
+              <div class="vax-date-done">Feb 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">PCV15</div><div class="vax-full">Pneumococcal Conjugate</div></div>
+              <div class="vax-date-done">Feb 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">IPV</div><div class="vax-full">Inactivated Poliovirus</div></div>
+              <div class="vax-date-done">Feb 5 ✓</div>
+            </div>
+            <div class="visit-complete-badge">✅ All 2-month vaccines complete</div>
+          </div>
+        </div>
+
+        <!-- 4 months -->
+        <div class="visit-card" id="vc-4m">
+          <div class="visit-header" onclick="toggleVisit('4m')">
+            <div>
+              <div class="visit-age">4 Months</div>
+              <div class="visit-date">April 5, 2026</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="chip chip-green">Done</span>
+              <span class="visit-arrow">▾</span>
+            </div>
+          </div>
+          <div class="visit-body">
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">RV</div><div class="vax-full">Rotavirus (2nd dose)</div></div>
+              <div class="vax-date-done">Apr 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">DTaP</div><div class="vax-full">2nd dose</div></div>
+              <div class="vax-date-done">Apr 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">Hib</div><div class="vax-full">2nd dose</div></div>
+              <div class="vax-date-done">Apr 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">PCV15</div><div class="vax-full">2nd dose</div></div>
+              <div class="vax-date-done">Apr 5 ✓</div>
+            </div>
+            <div class="vax-item done" onclick="toggleVax(this)">
+              <div class="vax-check">✓</div>
+              <div><div class="vax-name">IPV</div><div class="vax-full">2nd dose</div></div>
+              <div class="vax-date-done">Apr 5 ✓</div>
+            </div>
+            <div class="visit-complete-badge">✅ All 4-month vaccines complete</div>
+          </div>
+        </div>
+
+        <!-- 6 months - upcoming -->
+        <div class="visit-card" id="vc-6m">
+          <div class="visit-header" onclick="toggleVisit('6m')">
+            <div>
+              <div class="visit-age">6 Months</div>
+              <div class="visit-date">June 5, 2026 · Due soon</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="chip chip-orange">Upcoming</span>
+              <span class="visit-arrow">▾</span>
+            </div>
+          </div>
+          <div class="visit-body">
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">HepB</div><div class="vax-full">Hepatitis B (3rd dose)</div></div>
+            </div>
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">RV</div><div class="vax-full">Rotavirus (3rd dose)</div></div>
+            </div>
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">DTaP</div><div class="vax-full">3rd dose</div></div>
+            </div>
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">Hib</div><div class="vax-full">3rd dose</div></div>
+            </div>
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">PCV15</div><div class="vax-full">3rd dose</div></div>
+            </div>
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">IPV</div><div class="vax-full">3rd dose</div></div>
+            </div>
+            <div class="vax-item" onclick="toggleVax(this)">
+              <div class="vax-check"></div>
+              <div><div class="vax-name">Flu</div><div class="vax-full">Influenza (annual)</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12 months -->
+        <div class="visit-card" id="vc-12m">
+          <div class="visit-header" onclick="toggleVisit('12m')">
+            <div>
+              <div class="visit-age">12 Months</div>
+              <div class="visit-date">December 5, 2026</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="chip chip-yellow">Pending</span>
+              <span class="visit-arrow">▾</span>
+            </div>
+          </div>
+          <div class="visit-body">
+            <div class="vax-item" onclick="toggleVax(this)"><div class="vax-check"></div><div><div class="vax-name">Hib</div><div class="vax-full">Final dose</div></div></div>
+            <div class="vax-item" onclick="toggleVax(this)"><div class="vax-check"></div><div><div class="vax-name">PCV15</div><div class="vax-full">4th dose</div></div></div>
+            <div class="vax-item" onclick="toggleVax(this)"><div class="vax-check"></div><div><div class="vax-name">MMR</div><div class="vax-full">Measles, Mumps, Rubella</div></div></div>
+            <div class="vax-item" onclick="toggleVax(this)"><div class="vax-check"></div><div><div class="vax-name">Varicella</div><div class="vax-full">Chickenpox</div></div></div>
+            <div class="vax-item" onclick="toggleVax(this)"><div class="vax-check"></div><div><div class="vax-name">HepA</div><div class="vax-full">Hepatitis A (1st dose)</div></div></div>
+          </div>
+        </div>
+
+        <div style="height: 16px;"></div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" fill="#5B5FEF"/><rect x="9" y="13" width="6" height="8" rx="1" fill="#fff"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" id="nav-milestones" onclick="switchTab('milestones')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#aaa" stroke-width="2" stroke-linecap="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#aaa" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Milestones</span>
+    </div>
+    <div class="nav-item" id="nav-allergy" onclick="switchTab('allergy')">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#aaa" stroke-width="2"/><path d="M12 8v4l3 3" stroke="#aaa" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Allergy</span>
+    </div>
+    <div class="nav-item" id="nav-vaccines" onclick="switchTab('vaccines')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M9 3h6v4H9z" fill="#aaa"/><path d="M12 7v14M8 11h8" stroke="#aaa" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Vaccines</span>
+    </div>
+  </div>
+
+  <!-- Add Food Modal -->
+  <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Log New Food Introduction</div>
+      <input class="modal-input" id="food-name" placeholder="Food name (e.g. Pea Puree)" />
+      <input class="modal-input" id="food-amount" placeholder="Amount (e.g. 2 tsp)" />
+      <select class="modal-input" id="food-reaction">
+        <option value="">Initial reaction observation</option>
+        <option>No visible reaction</option>
+        <option>Mild interest / ate well</option>
+        <option>Spit out / refused</option>
+      </select>
+      <div style="background:#eff6ff;border-radius:10px;padding:10px 12px;margin-bottom:4px">
+        <div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:2px">⏱ 3-Day Allergy Buffer</div>
+        <div style="font-size:11px;color:#3b82f6">A 72-hour monitoring window will start automatically. You'll receive daily check-in reminders.</div>
+      </div>
+      <button class="modal-btn" onclick="addFoodTrack()">Start 3-Day Tracking</button>
+      <span class="modal-cancel" onclick="closeModal()">Cancel</span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ──────────────────────────────────────────
+// MILESTONE DATA (0-24 months, CDC-based)
+// ──────────────────────────────────────────
+const milestoneData = {
+  2: {
+    label: "2 Months",
+    risk: { level: "green", text: "On Track", sub: "Sophia is meeting all 2-month milestones!" },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Smiles at people", status: "met" },
+        { text: "Calms down when spoken to or picked up", status: "met" },
+        { text: "Looks at your face", status: "met" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Makes sounds other than crying", status: "met" },
+        { text: "Reacts to loud sounds", status: "met" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Watches things as they move", status: "met" },
+        { text: "Looks at own hands with interest", status: "emerging" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Holds head up when on tummy", status: "met" },
+        { text: "Moves arms and legs", status: "met" },
+      ]},
+    ]
+  },
+  4: {
+    label: "4 Months",
+    risk: { level: "green", text: "On Track", sub: "Sophia is meeting all 4-month milestones!" },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Smiles on own to get attention", status: "met" },
+        { text: "Chuckles (not yet a full laugh)", status: "met" },
+        { text: "Recognizes familiar people from a distance", status: "met" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Makes sounds like 'oooo' and 'aahh'", status: "met" },
+        { text: "Makes sounds back when you talk to them", status: "met" },
+        { text: "Turns head towards the sound of your voice", status: "met" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "If hungry, opens mouth when sees breast/bottle", status: "met" },
+        { text: "Looks at hands with interest", status: "met" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Holds head steady without support", status: "met" },
+        { text: "Holds a toy when put in hand", status: "met" },
+        { text: "Uses arms to swing at toys", status: "emerging" },
+      ]},
+    ]
+  },
+  6: {
+    label: "6 Months",
+    risk: { level: "green", text: "On Track", sub: "Sophia is meeting all 6-month milestones!" },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Knows familiar faces, begins to know if someone is a stranger", status: "met" },
+        { text: "Likes to play with others (peek-a-boo)", status: "met" },
+        { text: "Looks at self in mirror", status: "met" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Takes turns making sounds with you", status: "met" },
+        { text: "Blows raspberries", status: "met" },
+        { text: "Squeals", status: "met" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Puts things in mouth to explore them", status: "met" },
+        { text: "Reaches to grab a toy they want", status: "met" },
+        { text: "Closes lips to show not hungry anymore", status: "met" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Rolls from tummy to back", status: "met" },
+        { text: "Pushes up with straight arms on tummy", status: "met" },
+        { text: "Leans on hands to support self when sitting", status: "emerging" },
+      ]},
+    ]
+  },
+  7: {
+    label: "7 Months",
+    risk: { level: "yellow", text: "2 Emerging Items", sub: "Monitor these milestones over the next few weeks." },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Knows familiar faces; notices strangers", status: "met" },
+        { text: "Enjoys playing peek-a-boo", status: "met" },
+        { text: "Shows distress when separated from caregiver", status: "emerging" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Babbles vowel-consonant combos (baba, mama)", status: "met" },
+        { text: "Responds to own name", status: "met" },
+        { text: "Uses voice to express joy and displeasure", status: "met" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Transfers objects from hand to hand", status: "met" },
+        { text: "Explores with hands and mouth", status: "met" },
+        { text: "Watches path of falling objects", status: "emerging" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Sits with minimal support", status: "met" },
+        { text: "Bounces when held standing", status: "met" },
+        { text: "Rolls from back to tummy", status: "met" },
+      ]},
+    ]
+  },
+  9: {
+    label: "9 Months",
+    risk: { level: "green", text: "On Track", sub: "Sophia is developing well at 9 months." },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Is shy or nervous with strangers", status: "not-yet" },
+        { text: "Shows several facial expressions (happy, sad, angry)", status: "not-yet" },
+        { text: "Looks when you call their name", status: "not-yet" },
+        { text: "Reacts when you leave (looks/reaches)", status: "not-yet" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Makes different sounds (mamama, bababa)", status: "not-yet" },
+        { text: "Lifts arms to be picked up", status: "not-yet" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Looks for objects when dropped out of sight", status: "not-yet" },
+        { text: "Bangs two things together", status: "not-yet" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Gets to sitting position without help", status: "not-yet" },
+        { text: "Pulls up to stand", status: "not-yet" },
+        { text: "Crawls", status: "not-yet" },
+        { text: "Pincer grasp (thumb + index finger)", status: "not-yet" },
+      ]},
+    ]
+  },
+  12: {
+    label: "12 Months",
+    risk: { level: "yellow", text: "Future Milestone", sub: "You'll be able to log these when Sophia turns 12 months." },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Plays games like pat-a-cake", status: "not-yet" },
+        { text: "Waves bye-bye", status: "not-yet" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Calls parents 'mama' or 'dada'", status: "not-yet" },
+        { text: "Says at least one word", status: "not-yet" },
+        { text: "Points to show something interesting", status: "not-yet" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Puts something into a container", status: "not-yet" },
+        { text: "Looks for hidden things", status: "not-yet" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Pulls up to stand", status: "not-yet" },
+        { text: "Walks holding on to furniture ('cruising')", status: "not-yet" },
+        { text: "Drinks from cup without lid", status: "not-yet" },
+      ]},
+    ]
+  },
+  15: {
+    label: "15 Months",
+    risk: { level: "yellow", text: "Future Milestone", sub: "Upcoming milestones for 15 months." },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Copies other children while playing", status: "not-yet" },
+        { text: "Shows you an object they like", status: "not-yet" },
+        { text: "Claps when excited", status: "not-yet" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Tries to say 1–2 words besides mama/dada", status: "not-yet" },
+        { text: "Looks at familiar object when named", status: "not-yet" },
+        { text: "Points to ask for something", status: "not-yet" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Stacks 2 objects", status: "not-yet" },
+        { text: "Tries to use things correctly (phone, cup)", status: "not-yet" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Takes a few steps on own", status: "not-yet" },
+        { text: "Uses fingers to feed self some food", status: "not-yet" },
+      ]},
+    ]
+  },
+  18: {
+    label: "18 Months",
+    risk: { level: "yellow", text: "Future Milestone", sub: "Upcoming milestones for 18 months." },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Moves away from you, then returns when scared", status: "not-yet" },
+        { text: "Points to show you something interesting", status: "not-yet" },
+        { text: "Puts hands out to wash them", status: "not-yet" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Tries to say 3+ words besides mama/dada", status: "not-yet" },
+        { text: "Follows 1-step instructions", status: "not-yet" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Copies you doing chores", status: "not-yet" },
+        { text: "Plays with toys in a simple way", status: "not-yet" },
+        { text: "Points to 1 body part", status: "not-yet" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Walks without holding anything", status: "not-yet" },
+        { text: "Scribbles", status: "not-yet" },
+        { text: "Drinks from a cup without a lid", status: "not-yet" },
+      ]},
+    ]
+  },
+  24: {
+    label: "24 Months (2 Years)",
+    risk: { level: "yellow", text: "Future Milestone", sub: "Upcoming milestones for 24 months." },
+    domains: [
+      { name: "Social & Emotional", icon: "❤️", color: "#fef2f2", items: [
+        { text: "Notices when others are hurt or upset", status: "not-yet" },
+        { text: "Looks at your face to see how to react", status: "not-yet" },
+      ]},
+      { name: "Language & Communication", icon: "💬", color: "#eff6ff", items: [
+        { text: "Points to things in a book", status: "not-yet" },
+        { text: "Says at least 50 words", status: "not-yet" },
+        { text: "Says 2-word phrases ('more milk')", status: "not-yet" },
+      ]},
+      { name: "Cognitive", icon: "🧠", color: "#f5f3ff", items: [
+        { text: "Holds something in one hand, uses other hand", status: "not-yet" },
+        { text: "Tries to use switches or buttons", status: "not-yet" },
+        { text: "Plays with more than one toy at the same time", status: "not-yet" },
+      ]},
+      { name: "Movement & Motor", icon: "💪", color: "#f0fdf4", items: [
+        { text: "Kicks a ball", status: "not-yet" },
+        { text: "Runs", status: "not-yet" },
+        { text: "Walks up steps with support", status: "not-yet" },
+        { text: "Eats with a spoon", status: "not-yet" },
+      ]},
+    ]
+  },
+};
+
+let currentMonth = 7;
+const statusCycleMap = { "not-yet": "emerging", "emerging": "met", "met": "concerned", "concerned": "not-yet" };
+const statusLabel = { "met": "Met ✓", "emerging": "Emerging", "not-yet": "Not Yet", "concerned": "Concerned – seek review" };
+
+function setMonth(m) {
+  currentMonth = m;
+  document.querySelectorAll('.month-pill').forEach(p => {
+    p.classList.toggle('active', parseInt(p.textContent) === m || p.textContent === m+'m');
+  });
+  renderMilestones();
+}
+
+function renderMilestones() {
+  const data = milestoneData[currentMonth];
+  if (!data) return;
+  const body = document.getElementById('milestone-body');
+
+  const riskColors = { green: 'green', yellow: 'yellow', orange: 'orange', red: 'red' };
+  const riskIcons = { green: '✅', yellow: '⚠️', orange: '🔶', red: '🚨' };
+
+  let html = `<div class="risk-banner ${riskColors[data.risk.level]}">
+    <div class="rb-icon">${riskIcons[data.risk.level]}</div>
+    <div class="rb-text">
+      <div class="rb-title">${data.risk.text}</div>
+      <div class="rb-sub">${data.risk.sub}</div>
+    </div>
+  </div>`;
+
+  data.domains.forEach((domain, di) => {
+    html += `<div class="domain-block">
+      <div class="domain-header">
+        <div class="domain-badge" style="background:${domain.color}">${domain.icon}</div>
+        ${domain.name}
+      </div>`;
+    domain.items.forEach((item, ii) => {
+      html += `<div class="milestone-item ${item.status}" onclick="cycleStatus(${currentMonth}, ${di}, ${ii})">
+        <div class="m-check">${item.status === 'met' ? '✓' : item.status === 'emerging' ? '~' : item.status === 'concerned' ? '!' : ''}</div>
+        <div class="m-text">
+          <div class="m-title">${item.text}</div>
+          <div class="m-status">${statusLabel[item.status]}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function cycleStatus(month, di, ii) {
+  const item = milestoneData[month].domains[di].items[ii];
+  item.status = statusCycleMap[item.status];
+  renderMilestones();
+  showToast('Status updated to: ' + statusLabel[item.status]);
+}
+
+renderMilestones();
+
+// ──────────────────────────────────────────
+// TAB SWITCHING
+// ──────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+// ──────────────────────────────────────────
+// ALLERGY MODAL
+// ──────────────────────────────────────────
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+function addFoodTrack() {
+  const name = document.getElementById('food-name').value.trim();
+  if (!name) { showToast('Please enter a food name'); return; }
+  closeModal();
+  showToast('✅ ' + name + ' — 3-day tracking started!');
+  document.getElementById('food-name').value = '';
+  document.getElementById('food-amount').value = '';
+}
+
+function toggleSymptom(btn) {
+  btn.classList.toggle('selected');
+  const noneBtn = btn.parentElement.querySelector('.none-selected');
+  if (noneBtn && btn.classList.contains('selected')) {
+    noneBtn.classList.remove('none-selected');
+  }
+}
+
+// ──────────────────────────────────────────
+// VACCINE TOGGLES
+// ──────────────────────────────────────────
+function toggleVisit(id) {
+  const card = document.getElementById('vc-' + id);
+  card.classList.toggle('open');
+}
+
+function toggleVax(el) {
+  el.classList.toggle('done');
+  const check = el.querySelector('.vax-check');
+  check.textContent = el.classList.contains('done') ? '✓' : '';
+  showToast(el.classList.contains('done') ? '✅ Vaccine recorded' : 'Vaccine unmarked');
+}
+
+// ──────────────────────────────────────────
+// COUNTDOWN TIMERS (live)
+// ──────────────────────────────────────────
+function formatMs(ms) {
+  if (ms <= 0) return 'Window Complete ✓';
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} remaining`;
+}
+
+// Simulate: track1 ends in ~23h14m, track2 ends in ~47h12m
+let t1 = 23 * 3600000 + 14 * 60000 + 8000;
+let t2 = 47 * 3600000 + 12 * 60000 + 31000;
+
+setInterval(() => {
+  t1 = Math.max(0, t1 - 1000);
+  t2 = Math.max(0, t2 - 1000);
+  const el1 = document.getElementById('timer1');
+  const el2 = document.getElementById('timer2');
+  if (el1) el1.textContent = formatMs(t1);
+  if (el2) el2.textContent = formatMs(t2);
+}, 1000);
+
+// ──────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
