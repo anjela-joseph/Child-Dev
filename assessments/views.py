@@ -32,7 +32,12 @@ class AssessmentListCreateView(generics.ListCreateAPIView):
         child = get_object_or_404(
             ChildProfile, pk=self.request.data.get('child'), parent=self.request.user
         )
-        serializer.save(child=child, age_at_assessment=child.age_in_years)
+        requested_age = self.request.data.get('age_at_assessment', child.age_in_years)
+        try:
+            age_at_assessment = int(requested_age)
+        except (TypeError, ValueError):
+            age_at_assessment = child.age_in_years
+        serializer.save(child=child, age_at_assessment=age_at_assessment)
 
 
 class AssessmentDetailView(generics.RetrieveAPIView):

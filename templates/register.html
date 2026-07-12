@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create account</title>
+  <style>
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#172033; --muted:#6b7280; --accent:#5b7cff; --border:#e7ebf2; }
+    body { font-family: Inter, Arial, sans-serif; margin:0; background:linear-gradient(135deg,#eef3ff,#f8fbff); color:var(--ink); }
+    .shell { min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .card { width:min(460px,100%); background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px; box-shadow:0 16px 40px rgba(15,23,42,.08); }
+    input, select { width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid var(--border); border-radius:12px; margin-top:8px; margin-bottom:12px; }
+    button { width:100%; border:0; background:var(--accent); color:white; padding:12px 14px; border-radius:12px; cursor:pointer; font-weight:700; }
+    .muted { color:var(--muted); font-size:13px; }
+    .error { color:#c23b3b; margin-top:8px; font-size:13px; }
+    .success { color:#18794e; margin-top:8px; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <h2 style="margin:0 0 8px 0;">Create parent account</h2>
+      <p class="muted">Register to manage child profiles and developmental tracking.</p>
+      <form id="registerForm">
+        <label>Email</label>
+        <input id="email" type="email" required />
+        <label>Username</label>
+        <input id="username" required />
+        <label>Phone</label>
+        <input id="phone" />
+        <label>Password</label>
+        <input id="password" type="password" required />
+        <label>Confirm password</label>
+        <input id="password2" type="password" required />
+        <button type="submit">Create account</button>
+      </form>
+      <div id="message" class="error"></div>
+      <p class="muted" style="margin-top:12px;"><a href="/login/">Already have an account? Sign in</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const payload = {
+        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
+        phone: document.getElementById('phone').value,
+        password: document.getElementById('password').value,
+        password2: document.getElementById('password2').value,
+      };
+      const message = document.getElementById('message');
+      message.className = 'error';
+      message.textContent = '';
+      const res = await fetch('/api/auth/register/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        message.className = 'success';
+        message.textContent = 'Account created. Please sign in now.';
+        setTimeout(() => window.location.href = '/login/', 900);
+      } else {
+        message.textContent = data.detail || JSON.stringify(data);
+      }
+    });
+  </script>
+</body>
+</html>

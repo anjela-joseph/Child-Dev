@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Dev Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background: #f8f9ff; color: #222; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 16px; }
+    button { padding: 10px 14px; border: none; background: #4f6df5; color: white; border-radius: 8px; cursor: pointer; }
+    pre { background: #111; color: #eee; padding: 12px; border-radius: 8px; overflow-x: auto; }
+    input { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Child Dev Backend Check</h2>
+    <p>This page demonstrates that the backend API is responding.</p>
+  </div>
+
+  <div class="card">
+    <h3>Login</h3>
+    <input id="email" placeholder="Email" value="parent@example.com" />
+    <input id="password" placeholder="Password" type="password" value="securepass123" />
+    <button onclick="login()">Login</button>
+    <pre id="loginResult">Waiting...</pre>
+  </div>
+
+  <div class="card">
+    <h3>Get Checklist</h3>
+    <button onclick="getChecklist()">Load checklist for age 5</button>
+    <pre id="checklistResult">Waiting...</pre>
+  </div>
+
+  <script>
+    let token = '';
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const resultBox = document.getElementById('loginResult');
+
+      try {
+        const res = await fetch('/api/token/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        token = data.access || '';
+        resultBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        resultBox.textContent = 'Login failed: ' + err;
+      }
+    }
+
+    async function getChecklist() {
+      const resultBox = document.getElementById('checklistResult');
+      if (!token) {
+        resultBox.textContent = 'Please login first.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/milestones/checklist/?age=5', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        resultBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        resultBox.textContent = 'Checklist failed: ' + err;
+      }
+    }
+  </script>
+</body>
+</html>
