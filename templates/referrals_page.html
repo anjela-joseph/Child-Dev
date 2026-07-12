@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Referrals</title>
+  <style>
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#172033; --muted:#6b7280; --accent:#5b7cff; --accent-soft:#e9eeff; --border:#e7ebf2; }
+    * { box-sizing: border-box; }
+    body { font-family: Inter, Arial, sans-serif; margin:0; background: var(--bg); color: var(--ink); }
+    .shell { max-width: 1080px; margin: 0 auto; padding: 24px; }
+    .topbar { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+    .nav a { margin-right:10px; color: var(--accent); text-decoration:none; font-weight:600; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; }
+    .muted { color: var(--muted); }
+    select { width:100%; max-width:260px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); }
+    button { border:0; background: var(--accent); color:white; padding:10px 14px; border-radius:10px; cursor:pointer; }
+    @media (max-width: 720px) { .shell { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0 0 4px 0;">Referrals</h2>
+        <div class="muted">See guidance and confirm that you’ve reviewed it.</div>
+      </div>
+      <div class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/milestones/">Milestones</a>
+        <a href="/assessments/">Assessments</a>
+        <a href="/care/">Care</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+        <strong>Choose an assessment</strong>
+        <select id="assessmentSelect"></select>
+      </div>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('childdev_token') || '';
+    let assessments = [];
+
+    function normalizeCollection(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.results)) return payload.results;
+      return [];
+    }
+
+    if (!token) {
+      window.location.href = '/login/';
+    }
+
+    async function loadAssessments() {
+      const res = await fetch('/api/assessments/', { headers:{ Authorization: 'Bearer ' + token } });
+      assessments = normalizeCollection(await res.json());
+      const select = document.getElementById('assessmentSelect');
+      select.innerHTML = assessments.map(item => `<option value="${item.id}">Assessment ${item.id}</option>`).join('');
+      loadReferrals();
+    }
+
+    async function loadReferrals() {
+      const assessmentId = document.getElementById('assessmentSelect').value;
+      const res = await fetch(`/api/referrals/assessment/${assessmentId}/`, { headers:{ Authorization: 'Bearer ' + token } });
+      const data = normalizeCollection(await res.json());
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+      if (!data.length) {
+        results.innerHTML = '<div class="card muted">No referral guidance found for this assessment.</div>';
+        return;
+      }
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="row"><strong>${item.guidance_title || 'Referral guidance'}</strong><span class="pill">${item.parent_acknowledged ? 'Reviewed' : 'Pending'}</span></div>
+          <div class="muted" style="margin-top:8px;">${item.guidance_text || 'No details available.'}</div>
+          ${!item.parent_acknowledged ? `<div style="margin-top:10px;"><button onclick="acknowledge(${item.id})">Mark as reviewed</button></div>` : ''}
+        `;
+        results.appendChild(card);
+      });
+    }
+
+    async function acknowledge(id) {
+      await fetch(`/api/referrals/${id}/acknowledge/`, { method:'POST', headers:{ Authorization: 'Bearer ' + token } });
+      loadReferrals();
+    }
+
+    document.getElementById('assessmentSelect').addEventListener('change', loadReferrals);
+    loadAssessments();
+  </script>
+</body>
+</html>

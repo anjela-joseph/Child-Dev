@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milestones</title>
+  <style>
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#172033; --muted:#6b7280; --accent:#5b7cff; --accent-soft:#e9eeff; --border:#e7ebf2; }
+    body { font-family: Inter, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--ink); }
+    .shell { max-width: 980px; margin: 0 auto; padding: 24px; }
+    .topbar { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+    .nav a { margin-right:10px; color: var(--accent); text-decoration:none; font-weight:600; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; }
+    .muted { color: var(--muted); }
+    .domain { margin-bottom: 12px; padding: 12px; background: #f8faff; border:1px solid var(--border); border-radius:12px; }
+    .item { padding: 8px 0; border-bottom:1px solid #eef2f7; }
+    .item:last-child { border-bottom:0; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0 0 4px 0;">Milestones</h2>
+        <div class="muted">View age-based milestone guidance from the backend.</div>
+      </div>
+      <div class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/assessments/">Assessments</a>
+        <a href="/care/">Care</a>
+        <a href="/referrals/">Referrals</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div>
+          <strong>Age-based checklist</strong>
+          <div class="muted">Select a child age to load the matching milestone domains.</div>
+        </div>
+        <select id="ageSelect" style="padding:8px 10px; border-radius:10px; border:1px solid var(--border);">
+          <option value="3">Age 3</option>
+          <option value="4">Age 4</option>
+          <option value="5" selected>Age 5</option>
+          <option value="6">Age 6</option>
+          <option value="7">Age 7</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('childdev_token') || '';
+
+    if (!token) {
+      window.location.href = '/login/';
+    }
+
+    async function loadChecklist() {
+      const age = document.getElementById('ageSelect').value;
+      const res = await fetch(`/api/milestones/checklist/?age=${age}`, { headers:{ Authorization: 'Bearer ' + token } });
+      const data = await res.json();
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+      if (!data.milestone_domains) {
+        container.innerHTML = '<div class="card muted">No milestone data available.</div>';
+        return;
+      }
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `<div class="pill">Age ${data.age}</div><h3 style="margin:10px 0 6px 0;">Milestone domains</h3>`;
+      data.milestone_domains.forEach(domain => {
+        const block = document.createElement('div');
+        block.className = 'domain';
+        block.innerHTML = `<strong>${domain.domain_label || domain.domain}</strong><div class="muted">${domain.items.length} milestones</div>`;
+        domain.items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'item';
+          row.innerHTML = `<div><strong>${item.description}</strong></div><div class="muted">Concern: ${item.severity_if_missed || 'standard'}</div>`;
+          block.appendChild(row);
+        });
+        card.appendChild(block);
+      });
+      container.appendChild(card);
+    }
+
+    document.getElementById('ageSelect').addEventListener('change', () => loadChecklist());
+    loadChecklist();
+  </script>
+</body>
+</html>

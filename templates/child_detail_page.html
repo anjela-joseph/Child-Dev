@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Profile</title>
+  <style>
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#172033; --muted:#6b7280; --accent:#5b7cff; --accent-soft:#e9eeff; --border:#e7ebf2; --success:#18794e; }
+    * { box-sizing: border-box; }
+    body { font-family: Inter, Arial, sans-serif; margin:0; background: var(--bg); color: var(--ink); }
+    .shell { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+    .nav a { color: var(--accent); text-decoration:none; font-weight:700; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+    .hero { background: linear-gradient(135deg, #ffffff, #f4f8ff); border: 1px solid var(--border); border-radius: 22px; padding: 22px; }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; }
+    .muted { color: var(--muted); }
+    .grid { display:grid; gap:16px; grid-template-columns: 1fr 1fr; }
+    .mini-card { background: #f8faff; border:1px solid var(--border); border-radius:14px; padding:12px; margin-top:8px; }
+    button { border:0; background: var(--accent); color:white; padding:10px 14px; border-radius:10px; cursor:pointer; }
+    textarea, input, select { width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid var(--border); border-radius:10px; margin-top:8px; margin-bottom:10px; }
+    .success { color: var(--success); }
+    .error { color:#c23b3b; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .shell { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="nav">
+      <a href="/">← Dashboard</a>
+      <a href="/milestones/">Milestones</a>
+      <a href="/assessments/">Assessments</a>
+      <a href="/care/">Care</a>
+      <a href="/referrals/">Referrals</a>
+    </div>
+
+    <div class="hero">
+      <div id="header"></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3 style="margin-top:0;">Child profile</h3>
+        <div id="profileSection"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Update child</h3>
+        <form id="editChildForm">
+          <input id="editName" placeholder="Name" required />
+          <input id="editDob" type="date" required />
+          <select id="editGender">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="O">Other</option>
+            <option value="N">Prefer not to say</option>
+          </select>
+          <textarea id="editNotes" placeholder="Notes"></textarea>
+          <button type="submit">Update child</button>
+        </form>
+        <div id="editMessage"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Development assessment</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+        <select id="assessmentAgeSelect">
+          <option value="3">Age 3</option>
+          <option value="4">Age 4</option>
+          <option value="5">Age 5</option>
+          <option value="6">Age 6</option>
+          <option value="7">Age 7</option>
+        </select>
+        <button onclick="startAssessment()">Start new assessment</button>
+      </div>
+      <div id="assessmentArea" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Milestones & care</h3>
+      <div id="detailsArea"></div>
+    </div>
+  </div>
+
+  <script>
+    const childId = {{ child_id }};
+    let token = localStorage.getItem('childdev_token') || '';
+    let child = null;
+
+    function normalizeCollection(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.results)) return payload.results;
+      return [];
+    }
+
+    if (!token) {
+      window.location.href = '/login/';
+    }
+
+    async function init() {
+      await loadChild();
+      await loadDetails();
+    }
+
+    async function loadChild() {
+      const res = await fetch(`/api/auth/children/${childId}/`, { headers: { Authorization: 'Bearer ' + token } });
+      child = await res.json();
+      document.getElementById('header').innerHTML = `
+        <div class="row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 style="margin:0 0 6px 0;">${child.name}</h2>
+            <div class="muted">Age ${child.age_in_years} • ${child.gender || '—'}</div>
+          </div>
+          <span class="pill">Individual profile</span>
+        </div>
+      `;
+      document.getElementById('editName').value = child.name;
+      document.getElementById('editDob').value = child.date_of_birth;
+      document.getElementById('editGender').value = child.gender || 'N';
+      document.getElementById('editNotes').value = child.notes || '';
+      document.getElementById('profileSection').innerHTML = `
+        <div class="mini-card">
+          <strong>Date of birth</strong>
+          <div class="muted">${child.date_of_birth}</div>
+        </div>
+        <div class="mini-card">
+          <strong>Gender</strong>
+          <div class="muted">${child.gender || '—'}</div>
+        </div>
+        <div class="mini-card">
+          <strong>Notes</strong>
+          <div class="muted">${child.notes || 'No notes yet.'}</div>
+        </div>
+      `;
+    }
+
+    async function loadDetails() {
+      const [checklistRes, historyRes, handoverRes, allergyRes] = await Promise.all([
+        fetch(`/api/milestones/checklist/?age=${child.age_in_years}`, { headers: { Authorization: 'Bearer ' + token } }),
+        fetch(`/api/assessments/child/${childId}/history/`, { headers: { Authorization: 'Bearer ' + token } }),
+        fetch(`/api/infant/handover/${childId}/`, { headers: { Authorization: 'Bearer ' + token } }),
+        fetch(`/api/infant/food-introductions/?child_id=${childId}`)
+      ]);
+      const checklist = await checklistRes.json();
+      const history = normalizeCollection(await historyRes.json());
+      const handover = await handoverRes.json();
+      const allergyLogs = normalizeCollection(await allergyRes.json());
+      const completedAssessments = history.filter(item => item.status === 'completed').length;
+      document.getElementById('detailsArea').innerHTML = `
+        <div class="mini-card">
+          <strong>Assessment history</strong>
+          <div class="muted">Completed assessments: ${completedAssessments}</div>
+        </div>
+        <div class="mini-card">
+          <strong>Milestones</strong>
+          <div class="muted">${(checklist.milestone_domains || []).slice(0, 4).map(d => d.domain_label || d.domain).join(', ')}</div>
+        </div>
+        <div class="mini-card">
+          <strong>Handover</strong>
+          <div class="muted">Blood group: ${handover.blood_group || '—'} • Medications: ${(handover.medications || []).map(m => `${m.name} (${m.dosage})`).join(', ') || '—'}</div>
+        </div>
+        <div class="mini-card">
+          <strong>Food introductions</strong>
+          <div class="muted">${allergyLogs.length ? allergyLogs.map(log => `${log.food_name} (${log.status})`).join(', ') : 'No food logs yet.'}</div>
+        </div>
+      `;
+    }
+
+    document.getElementById('editChildForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('editName').value,
+        date_of_birth: document.getElementById('editDob').value,
+        gender: document.getElementById('editGender').value,
+        notes: document.getElementById('editNotes').value,
+      };
+      const res = await fetch(`/api/auth/children/${childId}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(payload)
+      });
+      const message = document.getElementById('editMessage');
+      if (res.ok) {
+        message.className = 'success';
+        message.textContent = 'Child updated successfully.';
+        await loadChild();
+      } else {
+        message.className = 'error';
+        message.textContent = 'Unable to update child.';
+      }
+    });
+
+    async function startAssessment() {
+      const age = document.getElementById('assessmentAgeSelect').value;
+      document.getElementById('assessmentArea').innerHTML = '<div class="muted">Starting assessment…</div>';
+      const res = await fetch('/api/assessments/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ child: childId, age_at_assessment: Number(age) })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById('assessmentArea').innerHTML = '<div class="error">Unable to create assessment.</div>';
+        return;
+      }
+      const checklistRes = await fetch(`/api/milestones/checklist/?age=${age}`, { headers: { Authorization: 'Bearer ' + token } });
+      const checklist = await checklistRes.json();
+      renderMilestoneForm(data.id, checklist, age);
+    }
+
+    function renderMilestoneForm(assessmentId, checklist, age) {
+      const items = (checklist.milestone_domains || []).flatMap(domain => domain.items.map(item => ({ ...item, domain: domain.domain_label || domain.domain })));
+      document.getElementById('assessmentArea').innerHTML = `
+        <div class="muted">Sample assessment for age ${age}</div>
+        <form onsubmit="submitMilestoneForm(event, ${assessmentId})">
+          ${items.map(item => `
+            <div class="mini-card" style="margin-top:8px;">
+              <strong>${item.description}</strong>
+              <div class="muted">${item.domain}</div>
+              <select data-item-id="${item.id}" style="margin-top:8px;">
+                <option value="met">Met</option>
+                <option value="emerging">Emerging</option>
+                <option value="not_yet">Not yet</option>
+                <option value="concerned">Concerned</option>
+              </select>
+              <textarea name="note-${item.id}" placeholder="Parent note"></textarea>
+            </div>
+          `).join('')}
+          <button type="submit" style="margin-top:10px;">Submit assessment</button>
+        </form>
+      `;
+    }
+
+    async function submitMilestoneForm(event, assessmentId) {
+      event.preventDefault();
+      const form = event.target;
+      const items = Array.from(form.querySelectorAll('[data-item-id]'));
+      const milestoneResponses = items.map(item => ({
+        milestone_item: Number(item.getAttribute('data-item-id')),
+        response: item.value,
+        parent_note: form.querySelector(`[name="note-${item.getAttribute('data-item-id')}"]`).value
+      }));
+      const res = await fetch(`/api/assessments/${assessmentId}/submit/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ milestone_responses: milestoneResponses, red_flag_responses: [] })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('assessmentArea').innerHTML = `
+          <div class="success">
+            <strong>Assessment submitted.</strong><br/>
+            Risk level: <strong>${data.risk_level || 'reviewed'}</strong><br/>
+            ${data.summary_message || ''}
+          </div>
+        `;
+        await loadDetails();
+      } else {
+        document.getElementById('assessmentArea').innerHTML = `<div class="error">${data.error || 'Unable to submit assessment.'}</div>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

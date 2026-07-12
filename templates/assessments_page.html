@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assessments</title>
+  <style>
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#172033; --muted:#6b7280; --accent:#5b7cff; --accent-soft:#e9eeff; --border:#e7ebf2; }
+    * { box-sizing: border-box; }
+    body { font-family: Inter, Arial, sans-serif; margin:0; background: var(--bg); color: var(--ink); }
+    .shell { max-width: 1080px; margin: 0 auto; padding: 24px; }
+    .topbar { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+    .nav a { margin-right:10px; color: var(--accent); text-decoration:none; font-weight:600; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; }
+    .muted { color: var(--muted); }
+    .row { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center; }
+    button { border:0; background: var(--accent); color:white; padding:10px 14px; border-radius:10px; cursor:pointer; }
+    select { width:100%; max-width:260px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); }
+    @media (max-width: 720px) { .shell { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0 0 4px 0;">Assessments</h2>
+        <div class="muted">Start a new assessment and review recent results.</div>
+      </div>
+      <div class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/milestones/">Milestones</a>
+        <a href="/care/">Care</a>
+        <a href="/referrals/">Referrals</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>Start assessment</strong>
+          <div class="muted">Choose a child and create a new assessment.</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <select id="childSelect"></select>
+          <button onclick="startAssessment()">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('childdev_token') || '';
+    let children = [];
+
+    function normalizeCollection(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.results)) return payload.results;
+      return [];
+    }
+
+    if (!token) {
+      window.location.href = '/login/';
+    }
+
+    async function loadChildren() {
+      const res = await fetch('/api/auth/children/', { headers:{ Authorization: 'Bearer ' + token } });
+      children = normalizeCollection(await res.json());
+      const select = document.getElementById('childSelect');
+      select.innerHTML = children.map(child => `<option value="${child.id}">${child.name}</option>`).join('');
+      loadHistory();
+    }
+
+    async function startAssessment() {
+      const childId = document.getElementById('childSelect').value;
+      const res = await fetch('/api/assessments/', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + token }, body: JSON.stringify({ child: Number(childId) }) });
+      const data = await res.json();
+      const results = document.getElementById('results');
+      results.innerHTML = `<div class="card"><strong>Assessment created</strong><div class="muted">ID: ${data.id} • Status: ${data.status}</div></div>`;
+      loadHistory();
+    }
+
+    async function loadHistory() {
+      if (!children.length) return;
+      const childId = document.getElementById('childSelect').value || children[0].id;
+      const res = await fetch(`/api/assessments/child/${childId}/history/`, { headers:{ Authorization: 'Bearer ' + token } });
+      const data = await res.json();
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+      if (!data.length) {
+        results.innerHTML = '<div class="card muted">No completed assessments yet.</div>';
+        return;
+      }
+      const list = document.createElement('div');
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<div class="row"><strong>Assessment ${item.id}</strong><span class="pill">${item.status}</span></div><div class="muted">Created: ${item.created_at}</div><div class="muted">Risk level: ${item.risk_level || 'pending'}</div>`;
+        list.appendChild(card);
+      });
+      results.appendChild(list);
+    }
+
+    document.getElementById('childSelect').addEventListener('change', loadHistory);
+    loadChildren();
+  </script>
+</body>
+</html>
