@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Care & Feeding</title>
+  <style>
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#172033; --muted:#6b7280; --accent:#5b7cff; --accent-soft:#e9eeff; --border:#e7ebf2; }
+    body { font-family: Inter, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--ink); }
+    .shell { max-width: 980px; margin: 0 auto; padding: 24px; }
+    .topbar { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+    .nav a { margin-right:10px; color: var(--accent); text-decoration:none; font-weight:600; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12px; font-weight:700; }
+    .muted { color: var(--muted); }
+    select { padding:8px 10px; border-radius:10px; border:1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0 0 4px 0;">Care & feeding</h2>
+        <div class="muted">Review food introductions and handover details for a child.</div>
+      </div>
+      <div class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/milestones/">Milestones</a>
+        <a href="/assessments/">Assessments</a>
+        <a href="/referrals/">Referrals</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+        <strong>Choose a child</strong>
+        <select id="childSelect"></select>
+      </div>
+    </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('childdev_token') || '';
+    let children = [];
+
+    if (!token) {
+      window.location.href = '/login/';
+    }
+
+    async function loadChildren() {
+      const res = await fetch('/api/auth/children/', { headers:{ Authorization: 'Bearer ' + token } });
+      children = await res.json();
+      const select = document.getElementById('childSelect');
+      select.innerHTML = children.map(child => `<option value="${child.id}">${child.name}</option>`).join('');
+      loadCareData();
+    }
+
+    async function loadCareData() {
+      const childId = document.getElementById('childSelect').value;
+      const [foodRes, handoverRes] = await Promise.all([
+        fetch(`/api/infant/food-introductions/?child_id=${childId}`),
+        fetch(`/api/infant/handover/${childId}/`)
+      ]);
+      const foodLogs = await foodRes.json();
+      const handover = await handoverRes.json();
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="pill">Handover</div>
+        <h3 style="margin:10px 0 6px 0;">${handover.child_name || 'Child'}</h3>
+        <div class="muted">Blood group: ${handover.blood_group || '—'}</div>
+        <div class="muted">Emergency instructions: ${handover.emergency_instructions || '—'}</div>
+        <div class="muted">Medications: ${(handover.medications || []).map(m => `${m.name} (${m.dosage})`).join(', ') || '—'}</div>
+      `;
+      results.appendChild(card);
+      const foodCard = document.createElement('div');
+      foodCard.className = 'card';
+      foodCard.innerHTML = '<strong>Food introduction log</strong>';
+      foodLogs.forEach(log => {
+        const row = document.createElement('div');
+        row.style.marginTop = '8px';
+        row.innerHTML = `<div><strong>${log.food_name}</strong></div><div class="muted">Status: ${log.status} • Buffer active: ${log.is_buffer_active ? 'Yes' : 'No'}</div>`;
+        foodCard.appendChild(row);
+      });
+      results.appendChild(foodCard);
+    }
+
+    document.getElementById('childSelect').addEventListener('change', loadCareData);
+    loadChildren();
+  </script>
+</body>
+</html>
