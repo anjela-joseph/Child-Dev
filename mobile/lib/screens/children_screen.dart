@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../core/api_client.dart';
 
 class ChildrenScreen extends StatefulWidget {
@@ -119,11 +120,26 @@ class _ChildrenScreenState extends State<ChildrenScreen> {
                       itemCount: _children.length,
                       itemBuilder: (context, index) {
                         final child = _children[index];
+                        final age = child['age_in_years'] as int? ?? 0;
+                        final ageDisplay = age < 3
+                            ? 'Under 3 years'
+                            : age > 7
+                                ? 'Over 7 years'
+                                : '$age years old';
                         return ListTile(
                           leading: const CircleAvatar(child: Icon(Icons.face)),
                           title: Text(child['name'] ?? ''),
-                          subtitle: Text('${child['age_in_years'] ?? '-'} years old • ${child['gender'] ?? ''}'),
-                          trailing: Text(child['date_of_birth'] ?? ''),
+                          subtitle: Text('$ageDisplay • ${child['gender'] ?? ''}'),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: (age >= 3 && age <= 7)
+                              ? () => context.push('/assessment', extra: {
+                                    'childId': child['id'] as int,
+                                    'childName': child['name'] as String,
+                                    'childAge': age,
+                                  })
+                              : () => ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Assessments are available for children aged 3–7.')),
+                                  ),
                         );
                       },
                     ),

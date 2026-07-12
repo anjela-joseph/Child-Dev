@@ -9,7 +9,7 @@ class ApiClient {
   static const _storage = FlutterSecureStorage();
   static const String _baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000/api',
+    defaultValue: 'http://127.0.0.1:8000/api',
   );
 
   final Dio _dio = Dio(
@@ -67,6 +67,10 @@ class ApiClient {
     if (response.data is List) {
       return List<Map<String, dynamic>>.from(response.data);
     }
+    // Handle paginated response: {"count": N, "results": [...]}
+    if (response.data is Map && response.data['results'] is List) {
+      return List<Map<String, dynamic>>.from(response.data['results']);
+    }
     return [];
   }
 
@@ -88,6 +92,38 @@ class ApiClient {
   Future<Map<String, dynamic>> fetchChecklist(int age) async {
     final response = await _dio.get('/milestones/checklist/', queryParameters: {'age': age});
     return response.data;
+  }
+
+  Future<Map<String, dynamic>> createAssessment({required int childId}) async {
+    final response = await _dio.post('/assessments/', data: {'child': childId});
+    return response.data;
+  }
+
+  Future<Map<String, dynamic>> submitAssessment({
+    required int assessmentId,
+    required List<Map<String, dynamic>> milestoneResponses,
+    required List<Map<String, dynamic>> redFlagResponses,
+  }) async {
+    final response = await _dio.post('/assessments/$assessmentId/submit/', data: {
+      'milestone_responses': milestoneResponses,
+      'red_flag_responses': redFlagResponses,
+    });
+    return response.data;
+  }
+
+  Future<List<Map<String, dynamic>>> fetchReferrals(int assessmentId) async {
+    final response = await _dio.get('/referrals/assessment/$assessmentId/');
+    if (response.data is List) {
+      return List<Map<String, dynamic>>.from(response.data);
+    }
+    if (response.data is Map && response.data['results'] is List) {
+      return List<Map<String, dynamic>>.from(response.data['results']);
+    }
+    return [];
+  }
+
+  Future<void> acknowledgeReferral(int referralId) async {
+    await _dio.post('/referrals/$referralId/acknowledge/');
   }
 
   Future<void> logout() async {
