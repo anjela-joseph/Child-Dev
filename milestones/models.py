@@ -53,9 +53,6 @@ class MilestoneItem(models.Model):
     is_red_flag = models.BooleanField(default=False)
     # True = this is a standalone red flag, not a standard milestone
     order = models.PositiveIntegerField(default=0)
-    target_age_months = models.IntegerField(null=True, blank=True, help_text="Specific month for ages 0-2")
-    video_url = models.URLField(blank=True, null=True, help_text="Reference video for new parents")
-    exercise_guidance = models.TextField(blank=True, help_text="Gentle activities if milestone is missed")
 
     class Meta:
         ordering = ['age_group', 'category__domain', 'order']
